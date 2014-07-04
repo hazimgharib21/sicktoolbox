@@ -59,7 +59,11 @@ const std::string SickNav350::GETDATALANDMARK_COMMAND="mNLMDGetData";
 const std::string SickNav350::GETDATANAVIGATION_COMMAND_TYPE="sMN";
 const std::string SickNav350::GETDATANAVIGATION_COMMAND="mNPOSGetData";
 
+const std::string SickNav350::SETSCANDATAFORMAT_COMMAND_TYPE="sWN";
+const std::string SickNav350::SETSCANDATAFORMAT_COMMAND="NAVScanDataFormat";
 
+const std::string SickNav350::SETACCESSMODE_COMMAND_TYPE="sMN";
+const std::string SickNav350::SETACCESSMODE_COMMAND="SetAccessMode";
   /**
    * \brief A standard constructor
    * \param sick_ip_address The ip address of the Sick Nav350
@@ -623,14 +627,157 @@ const std::string SickNav350::GETDATANAVIGATION_COMMAND="mNPOSGetData";
 	    }
 
   }
+
+  void SickNav350::SetScanDataFormat (uint8_t dataMode, uint8_t showRSSI)throw( SickIOException, SickTimeoutException, SickErrorException )
+  {
+	  this->SetAccessMode(3);
+
+	  std::cout<<"set scan data format: " << dataMode<< ", " << showRSSI <<std::endl;
+	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	  int count=0;
+	  std::string command_type=this->SETSCANDATAFORMAT_COMMAND_TYPE;
+	  std::string command=this->SETSCANDATAFORMAT_COMMAND;
+	  for (int i=0;i<command_type.length();i++)
+	  {
+		  payload_buffer[count]=command_type[i];
+		  count++;
+	  }
+	  payload_buffer[count]=' ';
+	  count++;
+	  for (int i=0;i<command.length();i++)
+	  {
+		  payload_buffer[count]=command[i];
+		  count++;
+	  }
+	  payload_buffer[count]=' ';
+	  count++;
+	  payload_buffer[count]=48+dataMode;
+	  count++;
+	  payload_buffer[count]=' ';
+	  count++;
+	  payload_buffer[count]=48+showRSSI;
+      count++;
+	  /* Create the Sick messages */
+	  SickNav350Message send_message(payload_buffer,count);
+	  SickNav350Message recv_message;
+
+
+	  uint8_t byte_sequence[] = {'s','W','A',' ','N','A','V','S','c','a','n','D','a','t','a','F','o','r','m','a','t'};
+	  int byte_sequence_length=21;
+
+
+	  /* Send the message and check the reply */
+	  try {
+		  _sendMessageAndGetReply(send_message,recv_message);
+		  //_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+		  //sick_nav350_sector_data_t.
+		  //	      _SplitReceivedMessage(recv_message);
+
+		  std::cout<<"Set data scan format response:" <<std::endl;
+		  //recv_message.Print();
+	  }
+
+	  catch(SickTimeoutException &sick_timeout_exception) {
+		  std::cerr << "sick_timeout_exception" << std::endl;
+
+		  throw;
+	  }
+
+	  catch(SickIOException &sick_io_exception) {
+		  std::cerr << "sick_io_exception" << std::endl;
+		  throw;
+	  }
+
+	  catch(...) {
+		  std::cerr << "SickNav350::_set scan data format - Unknown exception!" << std::endl;
+		  throw;
+	  }
+
+  }
+
+  void SickNav350::SetAccessMode( uint8_t newMode) throw(SickIOException, SickTimeoutException, SickErrorException)
+  {
+	  std::cout<<"set access mode: " << newMode<<std::endl;
+	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	  int count=0;
+	  std::string command_type=this->SETACCESSMODE_COMMAND_TYPE;
+	  std::string command=this->SETACCESSMODE_COMMAND;
+	  std::string password="";
+	  if (newMode == 2)
+		  password="B21ACE26"; //Password for Operator mode
+	  else if (newMode == 3)
+		  password="F4724744"; //Password for Client mode
+
+	  for (int i=0;i<command_type.length();i++)
+	  {
+		  payload_buffer[count]=command_type[i];
+		  count++;
+	  }
+	  payload_buffer[count]=' ';
+	  count++;
+	  for (int i=0;i<command.length();i++)
+	  {
+		  payload_buffer[count]=command[i];
+		  count++;
+	  }
+	  payload_buffer[count]=' ';
+	  count++;
+	  payload_buffer[count]=48+newMode;
+	  count++;
+	  payload_buffer[count]=' ';
+	  count++;
+	  for (int i=0; i<password.length(); i++)
+	  {
+		  payload_buffer[count]=password[i];
+		  count++;
+	  }
+
+	  /* Create the Sick messages */
+	  SickNav350Message send_message(payload_buffer,count);
+	  SickNav350Message recv_message;
+
+
+	  uint8_t byte_sequence[] = {'s','A','N',' ','S','e','t','A','c','c','e','s','s','M','o','d','e'};
+	  int byte_sequence_length=17;
+
+
+	  /* Send the message and check the reply */
+	  try {
+		  _sendMessageAndGetReply(send_message,recv_message);
+		  //_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+		  //sick_nav350_sector_data_t.
+		  //	      _SplitReceivedMessage(recv_message);
+
+		  std::cout<<"Set access mode response:" <<std::endl;
+		  //recv_message.Print();
+	  }
+
+	  catch(SickTimeoutException &sick_timeout_exception) {
+		  std::cerr << "sick_timeout_exception" << std::endl;
+
+		  throw;
+	  }
+
+	  catch(SickIOException &sick_io_exception) {
+		  std::cerr << "sick_io_exception" << std::endl;
+		  throw;
+	  }
+
+	  catch(...) {
+		  std::cerr << "SickNav350::_set access mode - Unknown exception!" << std::endl;
+		  throw;
+	  }
+
+  }
+
   void SickNav350::GetData(int wait,int dataset)
   {
-	    uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
-	    int count=0;
-	    std::string command_type=this->GETDATA_COMMAND_TYPE;
-	    std::string command=this->GETDATA_COMMAND;
-	    for (int i=0;i<command_type.length();i++)
-	    {
+	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	  int count=0;
+	  std::string command_type=this->GETDATA_COMMAND_TYPE;
+	  std::string command=this->GETDATA_COMMAND;
+	  for (int i=0;i<command_type.length();i++)
+	  {
 	    	payload_buffer[count]=command_type[i];
 	    	count++;
 	    }
@@ -949,6 +1096,17 @@ const std::string SickNav350::GETDATANAVIGATION_COMMAND="mNPOSGetData";
 		  break;
 	  }
 
+	  if (arg[count++] == "1")
+	  {
+		  //std::cout << "Includes remission data" << std::endl;
+		  count+=6;
+		  uint16_t num_data = _ConvertHexToDec(arg[count++]);
+		  //std::cout << num_data << std::endl;
+		  for (int i=0; i<num_data; i++)
+		  {
+			  MeasuredData_->echo_values[i]=_ConvertHexToDec(arg[count++]);
+		  }
+	  }
 
   }
 
@@ -987,6 +1145,25 @@ const std::string SickNav350::GETDATANAVIGATION_COMMAND="mNPOSGetData";
 	  *sector_start_timestamp=MeasuredData_->timestamp_start;
 	  *sector_stop_timestamp=MeasuredData_->timestamp_start;
 
+  }
+  void SickNav350::GetSickMeasurementsWithRemission(double* range_values, unsigned int *remission_values,unsigned int *num_measurements,
+      		    double *sector_step_angle,
+          		double *sector_start_angle,
+          		double *sector_stop_angle,
+          		unsigned int *sector_start_timestamp,
+          		unsigned int *sector_stop_timestamp)
+  {
+	  for (int i=0;i<MeasuredData_->num_data_points;i++)
+	  {
+		  range_values[i]=MeasuredData_->range_values[i];
+		  remission_values[i]=MeasuredData_->echo_values[i];
+	  }
+	  *num_measurements=MeasuredData_->num_data_points;
+	  *sector_step_angle=MeasuredData_->angle_step;
+	  *sector_start_angle=MeasuredData_->angle_start;
+	  *sector_stop_angle=MeasuredData_->angle_stop;
+	  *sector_start_timestamp=MeasuredData_->timestamp_start;
+	  *sector_stop_timestamp=MeasuredData_->timestamp_start;
   }
   void SickNav350::GetResponseFromCustomMessage(uint8_t *req,int req_size,uint8_t *res,int* res_size)
   {

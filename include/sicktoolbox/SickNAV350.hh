@@ -133,6 +133,14 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     static const std::string GETDATANAVIGATION_COMMAND_TYPE;
     static const std::string GETDATANAVIGATION_COMMAND;
 
+    /* Define the command setScanDataFormat */
+    static const std::string SETSCANDATAFORMAT_COMMAND_TYPE;
+    static const std::string SETSCANDATAFORMAT_COMMAND;
+
+    /* Define the command setAccesMode */
+    static const std::string SETACCESSMODE_COMMAND_TYPE;
+    static const std::string SETACCESSMODE_COMMAND;
+
     /**
      * \struct sick_nav350_config_global_tag
      * \brief A structure to aggregate the data used to configure the
@@ -284,8 +292,13 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     void GetSickTime( uint16_t &sick_time )
       throw( SickIOException, SickTimeoutException, SickErrorException );
   
+    /** Sets the scan data format to be used (until power is cycled). This is defined on Page 26 of NAV350 Telegram Listing **/
+    void SetScanDataFormat (uint8_t dataMode, uint8_t showRSSI)
+      throw( SickIOException, SickTimeoutException, SickErrorException );
 
-
+    /** Sets the access mode */
+    void SetAccessMode( uint8_t newMode)
+      throw(SickIOException, SickTimeoutException, SickErrorException);
 
     /** Acquire the Sick LD's current scan resolution */
     double GetSickScanResolution( ) const;
@@ -327,6 +340,13 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     		double *sector_stop_angle,
     		unsigned int *sector_start_timestamp,
     		unsigned int *sector_stop_timestamp);
+
+    void GetSickMeasurementsWithRemission(double* range_values, unsigned int *remission_values,unsigned int *num_measurements,
+    		    double *sector_step_angle,
+        		double *sector_start_angle,
+        		double *sector_stop_angle,
+        		unsigned int *sector_start_timestamp,
+        		unsigned int *sector_stop_timestamp);
 
     /**Send custom message and get response*/
     void GetResponseFromCustomMessage(uint8_t *req,int req_size,uint8_t *res,int *res_size);
