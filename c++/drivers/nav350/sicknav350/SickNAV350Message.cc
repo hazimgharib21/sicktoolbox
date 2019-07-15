@@ -20,9 +20,13 @@
 #include <iomanip>
 #include <iostream>
 #include <arpa/inet.h> 
+#include <sstream>
+#include <iterator>
+#include <map>
 
 #include "sicktoolbox/SickNAV350Message.hh"
 #include "sicktoolbox/SickNAV350Utility.hh" // for byye-order conversions where necessary
+
 
 /* Associate the namespace */
 namespace SickToolbox {
@@ -73,11 +77,32 @@ namespace SickToolbox {
      * Set the message trailer (just a checksum)!
      */
     _message_buffer[_message_length-1] = 0x03;
-//    std::cout<<"message length"<<_message_length<<std::endl;
-/*    for (int i=0;i<_message_length;i++)
+    //std::cout<<"message length"<<_message_length<<std::endl;
+    std::stringstream ss;
+    ss << _message_buffer;
+    std::string sMN = "sMN";
+    std::string str = ss.str();
+    std::string delimiter = " ";
+    std::string ack = str.substr(0, str.find(delimiter));
+    str.erase(0, str.find(delimiter) + delimiter.length());
+    std::string cmd = str.substr(0, str.find(delimiter));
+    if(ack == " sMN "){
+      std::cout << "REQUEST" << std::endl;
+    }
+    
+    std::cout << "TYPE : " << ack << sMN << std::endl;
+    std::cout << "CMD : " << cmd << "\n" << std::endl;
+
+
+
+    
+    //std::cout << str << std::endl;
+/*
+    for (int i=0;i<_message_length;i++)
     {
-    	std::cout<<(char) _message_buffer[i]<<"  "<<(int) _message_buffer[i]<<std::endl;
-    }*/
+    	std::cout<<(char) _message_buffer[i]<<"  "<<(int) _message_buffer[i];
+    }
+    */
 
 
   }
