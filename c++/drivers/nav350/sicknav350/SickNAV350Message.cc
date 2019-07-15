@@ -80,19 +80,50 @@ namespace SickToolbox {
     //std::cout<<"message length"<<_message_length<<std::endl;
     std::stringstream ss;
     ss << _message_buffer;
-    std::string sMN = "sMN";
     std::string str = ss.str();
     std::string delimiter = " ";
+    std::string delimiter2 = "";
     std::string ack = str.substr(0, str.find(delimiter));
+    std::string ack_str = "";
     str.erase(0, str.find(delimiter) + delimiter.length());
     std::string cmd = str.substr(0, str.find(delimiter));
-    if(ack == " sMN "){
-      std::cout << "REQUEST" << std::endl;
+    std::string result = "";
+
+   
+    char ack_arr[ack.length() + 1];
+    strcpy(ack_arr, ack.c_str());
+    for(int i = 0; i < ack.length(); i++){
+      if(i != 0){
+        ack_arr[i-1] = ack_arr[i];
+      }
+    }
+    std::string new_ack(ack_arr, 3);
+
+    if(new_ack.compare("sMN") == 0){
+      ack_str = "REQUEST";
+    }else if(new_ack.compare("sMA") == 0){
+      ack_str = "ACKNOWLEDGE";
+    }else if(new_ack.compare("sAN") == 0){
+      ack_str = "RESULT";
+      str.erase(0, str.find(delimiter) + delimiter.length());
+      result = str;
+      
+
+    }else if(new_ack.compare("sWN") == 0){
+      ack_str = "WRITE";
+    }else if(new_ack.compare("sWA") == 0){
+      ack_str = "RESPONSE";
+      str.erase(0, str.find(delimiter) + delimiter.length());
+      result = str;
+      
+
+    }else{
+      ack_str = "ERROR " + new_ack;
     }
     
-    std::cout << "TYPE : " << ack << sMN << std::endl;
-    std::cout << "CMD : " << cmd << "\n" << std::endl;
-
+    //std::cout << "TYPE : " << ack_str << std::endl;
+    //std::cout << "CMD : " << cmd << std::endl;
+    //std::cout << "RESULT : " << result << "\n" << std::endl;
 
 
     

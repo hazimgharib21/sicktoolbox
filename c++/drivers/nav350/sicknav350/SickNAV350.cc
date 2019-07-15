@@ -1016,11 +1016,11 @@ const std::string SickNav350::SETACCESSMODE_COMMAND="SetAccessMode";
 	  }*/
 	  if (arg[count++]=="1")
 	  {
-//		  std::cout<<"Landmark data follow"<<std::endl;
-		  //std::cout<<"Landmark filter "<<
-				 arg[count++];//<<std::endl;
+		  std::cout<<"\nLandmark data follow"<<std::endl;
+		  std::cout<<"Landmark filter "<<
+				 arg[count++] <<std::endl;
 		  int refcount=atoi(arg[count++].c_str());
-		  //std::cout<<"reflector count: "<<refcount<<std::endl;
+		  std::cout<<"reflector count: "<<refcount<<"\n" <<std::endl;
 		  for (int i=0;i<refcount;i++)
 		  {
 			  if (arg[count++]=="0")
@@ -1063,27 +1063,27 @@ const std::string SickNav350::SETACCESSMODE_COMMAND="SetAccessMode";
 		  std::cout<<"No scan data"<<std::endl;
 		  break;
 	  case 1:
-//		  std::cout<<"One output channel"<<std::endl;
+		  //std::cout<<"One output channel"<<std::endl;
 		  if (arg[count++]=="DIST1")
 		  {
 			  count++; //scalefactor=1
 			  count++; //offset=0
 			  MeasuredData_->angle_start=(double) _ConvertHexToDec(arg[count++])/1000;
-//			  std::cout<<"Start angle(grad):"<<MeasuredData_->angle_start<<std::endl;
+			  //std::cout<<"Start angle(grad):"<<MeasuredData_->angle_start<<std::endl;
 			  std::string str=arg[count++];
 			  MeasuredData_->angle_step=(double) _ConvertHexToDec(str)/1000;
-//			  std::cout<<"Resolution (deg):"<<MeasuredData_->angle_step<<std::endl;
+			  //std::cout<<"Resolution (deg):"<<MeasuredData_->angle_step<<std::endl;
 			  MeasuredData_->timestamp_start=_ConvertHexToDec(arg[count++]);
-//			  std::cout<<"Timestamp start (ms)"<<MeasuredData_->timestamp_start<<std::endl;
+			  //std::cout<<"Timestamp start (ms)"<<MeasuredData_->timestamp_start<<std::endl;
 			  MeasuredData_->num_data_points=_ConvertHexToDec(arg[count++]);
-//			  std::cout<<"Number of data points "<<MeasuredData_->num_data_points<<std::endl;
+			  //std::cout<<"Number of data points "<<MeasuredData_->num_data_points<<std::endl;
 			  MeasuredData_->angle_stop=MeasuredData_->angle_start+(MeasuredData_->num_data_points-1)*(MeasuredData_->angle_step);
 			  for (int i=0;i<MeasuredData_->num_data_points;i++)
 			  {
 				  MeasuredData_->range_values[i]=_ConvertHexToDec(arg[count++]);
 			  }
-//			  std::cout<<"Data read: "<<count<<std::endl;
-//			  std::cout<<"data received "<<argumentcount_<<std::endl;
+			  //std::cout<<"Data read: "<<count<<std::endl;
+			  //std::cout<<"data received "<<argumentcount_<<std::endl;
 
 		  }
 		  else
