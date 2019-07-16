@@ -43,12 +43,12 @@
 #include "sicktoolbox/SickNAV350Message.hh"
 #include "sicktoolbox/SickException.hh"
 #define SICK_MAX_NUM_REFLECTORS 50
+
 /**
  * \namespace SickToolbox
  * \brief Encapsulates the Sick NAV350 Matlab/C++ toolbox
  */
 namespace SickToolbox {
-
 
   /**
    * \class SickNav350
@@ -103,43 +103,71 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     static const uint16_t SICK_MIN_MOTOR_SPEED = 8;                                     ///< Minimum motor speed in Hz
     static const uint16_t SICK_MAX_MOTOR_SPEED = 8;                                    ///< Maximum motor speed in Hz
     static const uint16_t SICK_MIN_VALID_SENSOR_ID = 1;                                 ///< The lowest value the Sick will accept as a Sensor ID
-    static const uint16_t SICK_MAX_VALID_SENSOR_ID = 254;                               ///< The largest value the Sick will accept as a Sensor ID    
+    static const uint16_t SICK_MAX_VALID_SENSOR_ID = 254;                               ///< The largest value the Sick will accept as a Sensor ID
     static const uint16_t SICK_MAX_MEAN_PULSE_FREQUENCY = 10800;                        ///< Max mean pulse frequence of the current device configuration (in Hz) (see page 22 of the operator's manual)
     static const uint16_t SICK_MAX_PULSE_FREQUENCY = 14400;                             ///< Max pulse frequency of the device (in Hz) (see page 22 of the operator's manual)
     static const uint16_t SICK_NUM_TICKS_PER_MOTOR_REV = 5760;                          ///< Odometer ticks per revolution of the Sick LD scan head
     static const double SICK_MAX_SCAN_ANGULAR_RESOLUTION = 0.125;                       ///< Minimum valid separation between laser pulses in active scan ares (deg)
     static const double SICK_DEGREES_PER_MOTOR_STEP = 0.0625;                           ///< Each odometer tick is equivalent to rotating the scan head this many degrees
-    
+
     /* Sick NAV350 sensor modes of operation */
     static const uint8_t SICK_SENSOR_MODE_POWERDOWN = 0x00;                                  ///< The Sick LD is powered down
     static const uint8_t SICK_SENSOR_MODE_STANDBY = 0x01;                                ///< The Sick NAV350 is in standby
     static const uint8_t SICK_SENSOR_MODE_MAPPING = 0x02;                               ///< The Sick NAV350 is mapping
     static const uint8_t SICK_SENSOR_MODE_LMDETECTION = 0x03;                                 ///< The Sick NAV350 is detecting landmarks
     static const uint8_t SICK_SENSOR_MODE_NAVIGATION = 0x04;                               ///< The Sick Nav350 is in navigation mode
-  
 
-    static const std::string GETIDENT_COMMAND_TYPE;
-    static const std::string GETIDENT_COMMAND;
+    /* COMMAND TYPE */
+    static const std::string READBYNAME_COMMAND;
+    static const std::string WRITEBYNAME_COMMAND;
+    static const std::string METHODCALL_COMMAND;
 
-    static const std::string SETOPERATINGMODE_COMMAND_TYPE;
-    static const std::string SETOPERATINGMODE_COMMAND;
-
-    static const std::string GETDATA_COMMAND_TYPE;
-    static const std::string GETDATA_COMMAND;
-
-    static const std::string GETDATALANDMARK_COMMAND_TYPE;
-    static const std::string GETDATALANDMARK_COMMAND;
-
-    static const std::string GETDATANAVIGATION_COMMAND_TYPE;
-    static const std::string GETDATANAVIGATION_COMMAND;
-
-    /* Define the command setScanDataFormat */
-    static const std::string SETSCANDATAFORMAT_COMMAND_TYPE;
-    static const std::string SETSCANDATAFORMAT_COMMAND;
-
-    /* Define the command setAccesMode */
-    static const std::string SETACCESSMODE_COMMAND_TYPE;
+    /* COMMAND */
+    static const std::string DEVICEIDENT_COMMAND;
+    static const std::string SERIALNUMBER_COMMAND;
+    static const std::string DEVICEINFO_COMMAND;
+    static const std::string FIRMWAREVERSION_COMMAND;
+    static const std::string CURLAYER_COMMAND;
+    static const std::string IDENTWINDOW_COMMAND;
+    static const std::string CFGMAPPING_COMMAND;
+    static const std::string SLIDINGMEAN_COMMAND;
+    static const std::string POSDATAFORMAT_COMMAND;
+    static const std::string LMDATAFORMAT_COMMAND;
+    static const std::string SCANDATAFORMAT_COMMAND;
+    static const std::string HWTIMESYNC_COMMAND;
+    static const std::string REFLECTORSIZE_COMMAND;
+    static const std::string REFLECTORTYPE_COMMAND;
+    static const std::string LMMATCHING_COMMAND;
+    static const std::string SECTORMUTING_COMMAND;
+    static const std::string COORDORIENTATION_COMMAND;
+    static const std::string CLOSESTREFL_COMMAND;
+    static const std::string ACTIONRADIUS_COMMAND;
+    static const std::string REFLTHRESHOLD_COMMAND;
+    static const std::string SETMODE_COMMAND;
     static const std::string SETACCESSMODE_COMMAND;
+    static const std::string SETPERMDATA_COMMAND;
+    static const std::string SYNCTIMESTAMP_COMMAND;
+    static const std::string NAVBREAK_COMMAND;
+    static const std::string NAVRESET_COMMAND;
+    static const std::string CFGSERIAL_COMMAND;
+    static const std::string CFGIP_COMMAND;
+    static const std::string CFGETH_COMMAND;
+    static const std::string ENABLEDHCP_COMMAND;
+    static const std::string ADDLANDMARK_COMMAND;
+    static const std::string EDITLANDMARK_COMMAND;
+    static const std::string DELETELANDMARK_COMMAND;
+    static const std::string READLANDMARK_COMMAND;
+    static const std::string READLAYER_COMMAND;
+    static const std::string READLAYOUT_COMMAND;
+    static const std::string ERASELAYOUT_COMMAND;
+    static const std::string SAVELAYOUT_COMMAND;
+    static const std::string DOMAPPING_COMMAND;
+    static const std::string GETLANDMARK_COMMAND;
+    static const std::string POSEREQ_COMMAND;
+    static const std::string POSEDATA_COMMAND;
+    static const std::string SETSPEED_COMMAND;
+    static const std::string SETPOSE_COMMAND;
+    static const std::string SETPOSEID_COMMAND;
 
     /**
      * \struct sick_nav350_config_global_tag
@@ -153,9 +181,9 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     typedef struct sick_nav350_config_global_tag {
       uint16_t sick_sensor_id;                                                            ///< The single word sensor ID for the Sick unit
       uint16_t sick_motor_speed;                                                          ///< Nominal motor speed value: 0x0005 to 0x0014 (5 to 20)
-      double sick_angle_step;                                                             ///< Difference between two laser pulse positions in 1/16th deg. (NOTE: this value must be a divisor of 5760 and be greater than 1)  
+      double sick_angle_step;                                                             ///< Difference between two laser pulse positions in 1/16th deg. (NOTE: this value must be a divisor of 5760 and be greater than 1)
     } sick_nav350_config_global_t;
-    
+
     /**
      * \struct sick_nav350_config_ethernet_tag
      * \brief A structure to aggregate the data used to configure
@@ -174,7 +202,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
       uint16_t sick_node_id;                                                              ///< Single word address of the Sick LD
       uint16_t sick_transparent_tcp_port;                                                 ///< The TCP/IP transparent port associated with the Sick LD
     } sick_nav350_config_ethernet_t;
-    
+
     /**
      * \struct sick_nav350_config_sector_tag
      * \brief A structure to aggregate data used to define the
@@ -186,13 +214,13 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
      */
     typedef struct sick_nav350_config_sector_tag {
       uint8_t sick_num_active_sectors;                                                    ///< Number of active sectors (sectors that are actually being scanned)
-      uint8_t sick_num_initialized_sectors;                                               ///< Number of sectors configured w/ a function other than "not initialized" 
+      uint8_t sick_num_initialized_sectors;                                               ///< Number of sectors configured w/ a function other than "not initialized"
       uint8_t sick_active_sector_ids[SICK_MAX_NUM_SECTORS];                               ///< IDs of all active sectors
       uint8_t sick_sector_functions[SICK_MAX_NUM_SECTORS];                                ///< Function values associated w/ each of the Sick LD's sectors
       double sick_sector_start_angles[SICK_MAX_NUM_SECTORS];                              ///< Start angles for each initialized sector (deg)
       double sick_sector_stop_angles[SICK_MAX_NUM_SECTORS];                               ///< Stop angles for each sector (deg)
     } sick_nav350_config_sector_t;
-    
+
     /**
      * \struct sick_nav350_identity_tag
      * \brief A structure to aggregate the fields that collectively
@@ -208,14 +236,14 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
       std::string sick_version;                                                           ///< The Sick LD's version number
       std::string sick_serial_number;                                                     ///< The Sick LD's serial number
       std::string sick_edm_serial_number;                                                 ///< The Sick LD's edm??? serial number
-      std::string sick_firmware_part_number;                                              ///< The Sick LD's firmware part number 
+      std::string sick_firmware_part_number;                                              ///< The Sick LD's firmware part number
       std::string sick_firmware_name;                                                     ///< The Sick LD's firmware name
       std::string sick_firmware_version;                                                  ///< The Sick LD's firmware version
       std::string sick_application_software_part_number;                                  ///< The Sick LD's app. software part number
       std::string sick_application_software_name;                                         ///< The Sick LD's app. software name
       std::string sick_application_software_version;                                      ///< The Sick LD's app. software version
     } sick_nav350_identity_t;
-    
+
     sick_nav350_reflector_tag ReflectorData_;
     sick_nav350_pose_tag PoseData_;
     /**
@@ -230,7 +258,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     typedef struct sick_nav350_sector_data_tag {
       unsigned int sector_num;                                                            ///< The sector number in the scan area
       unsigned int num_data_points;                                                       ///< The number of data points in the scan area
-      unsigned int timestamp_start;                                                       ///< The timestamp (in ms) corresponding to the time the first measurement in the sector was taken 
+      unsigned int timestamp_start;                                                       ///< The timestamp (in ms) corresponding to the time the first measurement in the sector was taken
       unsigned int timestamp_stop;                                                        ///< The timestamp (in ms) corresponding to the time the last measurement in the sector was taken
       unsigned int echo_values[SICK_MAX_NUM_MEASUREMENTS];                                ///< The corresponding echo/reflectivity values
       double angle_step;                                                                  ///< The angle step used for the given sector (this should be the same for all sectors)
@@ -239,7 +267,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
       double range_values[SICK_MAX_NUM_MEASUREMENTS];                                     ///< The corresponding range values (NOTE: The size of this array is intended to be large enough to accomodate various sector configs.)
       double scan_angles[SICK_MAX_NUM_MEASUREMENTS];                                      ///< The scan angles corresponding to the respective measurements
     } sick_nav350_sector_data_t;
-    
+
     /**
      * \struct sick_nav350_scan_profile_tag
      * \brief A structure to aggregate the fields that collectively
@@ -257,14 +285,14 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
       unsigned int sensor_status;                                                         ///< The status of the Sick LD sensor
       unsigned int motor_status;                                                          ///< The status of the Sick LD motor
       unsigned int num_sectors;                                                           ///< The number of sectors returned in the profile
-      sick_nav350_sector_data_t sector_data[SICK_MAX_NUM_SECTORS];                            ///< The sectors associated with the scan profile 
+      sick_nav350_sector_data_t sector_data[SICK_MAX_NUM_SECTORS];                            ///< The sectors associated with the scan profile
     } sick_nav350_scan_profile_t;
-    
+
     sick_nav350_sector_data_tag* MeasuredData_;
     /** Primary constructor */
     SickNav350( const std::string sick_ip_address = DEFAULT_SICK_IP_ADDRESS,
 	    const uint16_t sick_tcp_port = DEFAULT_SICK_TCP_PORT );
-    
+
     /** Initializes the Sick LD unit (use scan areas defined in flash) */
     void Initialize( )  throw( SickIOException, SickThreadException, SickTimeoutException, SickErrorException );
 
@@ -279,7 +307,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     void SetSickTempScanAreas( const double * active_sector_start_angles, const double * const active_sector_stop_angles,
 			       const unsigned int num_active_sectors )
       throw( SickTimeoutException, SickIOException, SickConfigException );
-    
+
     /** Sets the internal clock of the Sick LD unit */
     void SetSickTimeAbsolute( const uint16_t absolute_clock_time, uint16_t &new_sick_clock_time )
       throw( SickErrorException, SickTimeoutException, SickIOException, SickConfigException );
@@ -291,7 +319,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     /** Gets the internal clock time of the Sick LD unit */
     void GetSickTime( uint16_t &sick_time )
       throw( SickIOException, SickTimeoutException, SickErrorException );
-  
+
     /** Sets the scan data format to be used (until power is cycled). This is defined on Page 26 of NAV350 Telegram Listing **/
     void SetScanDataFormat (uint8_t dataMode, uint8_t showRSSI)
       throw( SickIOException, SickTimeoutException, SickErrorException );
@@ -302,16 +330,16 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
     /** Acquire the Sick LD's current scan resolution */
     double GetSickScanResolution( ) const;
-  
+
     /** Acquire the current IP address of the Sick */
     std::string GetSickIPAddress( ) const;
-  
+
     /** Acquire the subnet mask for the Sick */
     std::string GetSickSubnetMask( ) const;
-  
+
     /** Acquire the IP address of the Sick gateway */
     std::string GetSickGatewayIPAddress( ) const;
-  
+
     /** Acquire the Sick LD's part number */
     std::string GetSickPartNumber( ) const;
 
@@ -351,6 +379,8 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     /**Send custom message and get response*/
     void GetResponseFromCustomMessage(uint8_t *req,int req_size,uint8_t *res,int *res_size);
 
+    void SetSpeed(double x, double y, double phi, int timestamp, int coordbase);
+
 
     /** Destructor */
     ~SickNav350();
@@ -367,7 +397,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
  //   /** Sick LD socket structure */
 //    unsigned int _socket;
-  
+
     /** Sick LD socket address structure */
     struct sockaddr_in _sick_inet_address_info;
 
@@ -377,13 +407,13 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
     /** Indicates whether the Sick LD is currently streaming range and echo data */
     bool _sick_streaming_range_and_echo_data;
-  
+
     /** The identity structure for the Sick */
     sick_nav350_identity_t _sick_identity;
 
     /** The current global configuration for the unit */
     sick_nav350_config_global_t _sick_global_config;
-  
+
     /** The current Ethernet configuration for the unit */
     sick_nav350_config_ethernet_t _sick_ethernet_config;
 
@@ -392,7 +422,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
     /** Setup the connection parameters and establish TCP connection! */
     void _setupConnection( ) throw( SickIOException, SickTimeoutException );
-  
+
     /** Synchronizes the driver state with the Sick LD (used for initialization) */
     void _syncDriverWithSick( ) throw( SickIOException, SickTimeoutException, SickErrorException );
 
@@ -400,11 +430,11 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     void _setSickSectorFunction( const uint8_t sector_number, const uint8_t sector_function,
 				 const double sector_angle_stop, const bool write_to_flash = false )
        throw( SickErrorException, SickTimeoutException, SickIOException, SickConfigException );
-  
+
     /** Acquires the given Sector's function (i.e. current config) */
     void _getSickSectorFunction( const uint8_t sector_num, uint8_t &sector_function, double &sector_stop_angle )
       throw( SickErrorException, SickTimeoutException, SickIOException );
-  
+
     /** Sets the Sick LD to IDLE mode */
     void _setSickSensorModeToIdle( ) throw( SickErrorException, SickTimeoutException, SickIOException );
 
@@ -413,11 +443,11 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
     /** Sets the Sick LD to MEASURE mode */
     void _setSickSensorModeToMeasure( ) throw( SickErrorException, SickTimeoutException, SickIOException );
-  
+
     /** Sets the Sick LD's sensor mode to IDLE (laser off, motor off) */
     void _setSickSensorMode( const uint8_t new_sick_sensor_mode )
       throw( SickErrorException, SickTimeoutException, SickIOException );
-  
+
     /** Requests n range measurement profiles from the Sick LD */
     void _getSickScanProfiles( const uint16_t profile_format, const uint16_t num_profiles = DEFAULT_SICK_NUM_SCAN_PROFILES )
       throw( SickErrorException, SickTimeoutException, SickIOException, SickConfigException );
@@ -431,7 +461,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     /** Turns nearfield suppression on/off */
     void _setSickFilter( const uint8_t suppress_code )
       throw( SickErrorException, SickTimeoutException, SickIOException );
-  
+
     /** Stores an image of the Sick LD's identity locally */
      void _getSickIdentity( ) /*throw( SickTimeoutException, SickIOException )*/;
 
@@ -450,11 +480,11 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
     /** Acquires the configuration (function and stop angle) for each sector */
     void _getSickSectorConfig( ) throw( SickErrorException, SickTimeoutException, SickIOException );
-  
+
     /** Query the Sick for ID information */
     void _getIdentificationString( const uint8_t id_request_code, std::string &id_return_string )
       throw( SickTimeoutException, SickIOException );
-  
+
     /** Query the Sick for its sensor part number */
     void _getSensorPartNumber( ) throw( SickTimeoutException, SickIOException );
 
@@ -509,22 +539,22 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     /** Sets the signals for the device */
     void _setSickSignals( const uint8_t sick_signal_flags = DEFAULT_SICK_SIGNAL_SET )
       throw( SickIOException, SickTimeoutException, SickErrorException );
-  
+
 
 
     /** Flushed the TCP receive buffer */
     void _flushTCPRecvBuffer( ) throw ( SickIOException, SickThreadException );
-    
+
 
     /** Generates a device-ready sector set given only an active sector spec. */
     void _generateSickSectorConfig( const double * const active_sector_start_angles,
 				    const double * const active_sector_stop_angles,
 				    const unsigned int num_active_sectors,
 				    const double sick_step_angle,
-				    unsigned int * const sector_functions, 
+				    unsigned int * const sector_functions,
 				    double * const sector_stop_angles,
 				    unsigned int &num_sectors ) const;
-  
+
     /** Converts odometry ticks to an equivalent angle */
     double _ticksToAngle( const uint16_t ticks ) const;
 
@@ -534,7 +564,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     /** Computes the mean pulse frequency for the given config */
     double _computeMeanPulseFrequency( const double active_scan_area, const double curr_motor_speed,
 				       const double curr_angular_resolution ) const;
-  
+
     /** Computes the total pulse frequency for the given config */
     double _computeMaxPulseFrequency( const double total_scan_area, const double curr_motor_speed,
 				      const double curr_angular_resolution ) const;
@@ -551,13 +581,13 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
     /** Indicates whether the given configuration yields a valid max and mean pulse frequency */
      bool _validPulseFrequency( const unsigned int sick_motor_speed, const double sick_step_angle ) const;
-  
+
     /** Indicates whether the given configuration yields a valid max and mean pulse frequency */
    bool _validPulseFrequency( const unsigned int sick_motor_speed, const double sick_step_angle,
 			       const double * const active_sector_start_angles,
 			       const double * const active_sector_stop_angles,
 			       const unsigned int num_active_sectors ) const;
-  
+
     /** Returns the scanning area for the device given the current sector configuration */
     double _computeScanArea( const double sick_step_angle, const double * const sector_start_angles,
 			     const double * const sector_stop_angles, const unsigned int num_sectors ) const;
@@ -569,9 +599,9 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     /** Checks the given sector arguments for overlapping regions yielding an invalid configuration */
     bool _validActiveSectors( const double * const sector_start_angles, const double * const sector_stop_angles,
 			      const unsigned int num_active_sectors ) const;
-    
+
     /** Indicates whether the supplied profile format is currently supported by the driver */
-    bool _supportedScanProfileFormat( const uint16_t profile_format ) const; 
+    bool _supportedScanProfileFormat( const uint16_t profile_format ) const;
 
     /** Prints data corresponding to a single scan sector (data obtained using GET_PROFILE) */
     void _printSectorProfileData( const sick_nav350_sector_data_t &sector_data ) const;
@@ -581,19 +611,19 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
     /** Converts _sick_sensor_mode to a representative string */
     std::string _sickSensorModeToString( const uint8_t sick_sensor_mode ) const;
- 
+
     /** Converts _sick_motor_mode to a representative string */
     std::string _sickMotorModeToString( const uint8_t sick_motor_mode ) const;
 
     /** Converts the specified trans measurement mode return value to a string */
     std::string _sickTransMeasureReturnToString( const uint8_t return_value ) const;
-  
+
     /** Converts the specified reset level to a representative string */
     std::string _sickResetLevelToString( const uint16_t reset_level ) const;
-  
+
     /** Converts Sick LD sector configuration word to a representative string */
     std::string _sickSectorFunctionToString( const uint16_t sick_sector_function ) const;
-  
+
     /** Converts a given scan profile format to a string for friendlier output */
     std::string _sickProfileFormatToString( const uint16_t profile_format ) const;
 
@@ -621,5 +651,5 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
 
 } //namespace SickToolbox
-  
+
 #endif /* SICK_NAV350_HH */

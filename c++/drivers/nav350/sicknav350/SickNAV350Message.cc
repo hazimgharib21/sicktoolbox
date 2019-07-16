@@ -106,7 +106,9 @@ namespace SickToolbox {
     }else if(new_ack.compare("sAN") == 0){
       ack_str = "RESULT";
       str.erase(0, str.find(delimiter) + delimiter.length());
-      result = str;
+
+      result = str.substr(0, str.find(delimiter));
+      //result = str;
       
 
     }else if(new_ack.compare("sWN") == 0){
@@ -114,6 +116,8 @@ namespace SickToolbox {
     }else if(new_ack.compare("sWA") == 0){
       ack_str = "RESPONSE";
       str.erase(0, str.find(delimiter) + delimiter.length());
+
+      result = str.substr(0, str.find(delimiter));
       result = str;
       
 
@@ -121,9 +125,9 @@ namespace SickToolbox {
       ack_str = "ERROR " + new_ack;
     }
     
-    //std::cout << "TYPE : " << ack_str << std::endl;
-    //std::cout << "CMD : " << cmd << std::endl;
-    //std::cout << "RESULT : " << result << "\n" << std::endl;
+    std::cout << "TYPE : " << ack_str << std::endl;
+    std::cout << "CMD : " << cmd << std::endl;
+    std::cout << "RESULT : " << result << "\n" << std::endl;
 
 
     
