@@ -80,7 +80,8 @@ struct sick_nav350_reflector_tag{
 } ;
 
 struct sick_nav350_pose_tag{
-	int x,y;
+	int x;
+  int y;
 	unsigned int phi;
 	unsigned int optionalPoseData;
 	unsigned int outputMode;
@@ -89,6 +90,7 @@ struct sick_nav350_pose_tag{
 	int positionMode;
 	int infoState;
 	int numUsedReflectors;
+  int optionalLandmarkData;
 };
 
 class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message > {

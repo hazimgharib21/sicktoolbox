@@ -1856,8 +1856,10 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 			  PoseData_.numUsedReflectors=_ConvertHexToDec(arg[count++]);
 		  }
 
+
 	  }
-	  if (arg[count++]=="1")
+	  PoseData_.optionalLandmarkData=_ConvertHexToDec(arg[count++]);
+	  if (PoseData_.optionalLandmarkData==1)
 	  {
 	//	  std::cout<<"Landmark data follow"<<std::endl;
 		  ReflectorData_.filter=_ConvertHexToDec(arg[count++]);
@@ -1865,6 +1867,7 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		  int refcount=atoi(arg[count++].c_str());
 		  ReflectorData_.num_reflector=refcount;
 //		  std::cout<<"reflector count: "<<refcount<<std::endl;
+		  
 		  for (int i=0;i<refcount;i++)
 		  {
 			  if (arg[count++]=="0")
