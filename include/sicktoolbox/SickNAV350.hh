@@ -361,7 +361,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     std::string GetMappingConfiguration();
     void SetSlidingMean(uint8_t mean);
     std::string GetSlidingMean();
-    void SetPoseDataFormat(bool outputMode, bool showOptParam);
+    void SetPoseDataFormat(uint8_t outputMode, uint8_t showOptParam);
     std::string GetPoseDataFormat();
     void SetLandmarkDataFormat(bool format, bool showOptParam, int landmarkFilter);
     std::string GetLandmarkDataFormat();
@@ -408,15 +408,13 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     void SetPose(double x, double y, double phi);
     void SetPoseID(uint16_t id);
 
-
-
     /** Get Sick Identity */
     void GetSickIdentity();
     /** Change to navigation mode */
     void SetOperatingMode(int mode);
 
     /**Get data */
-    void GetData(int wait,int dataset);
+    void GetPoseData(int wait,int dataset);
 
     void GetDataLandMark(int wait,int dataset);
 

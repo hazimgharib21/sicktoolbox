@@ -880,7 +880,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
   void SickNav350::SetOperatingMode(int mode)
   {
-	  std::cout<<"set operating_mode_command"<<std::endl;
 	    uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
 	    int count=0;
 	    std::string command_type=this->METHODCALL_COMMAND;
@@ -913,12 +912,12 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
 	    /* Send the message and check the reply */
 	    try {
+			std::cout << "\t\tSet Mode : " << mode << std::endl;
 	      _sendMessageAndGetReply(send_message,recv_message);
 	      _recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
 	      //sick_nav350_sector_data_t.
-//	      _SplitReceivedMessage(recv_message);
+	      //_SplitReceivedMessage(recv_message);
 
-	      std::cout<<"Set operating mode"<<std::endl;
 	    }
 
 	    catch(SickTimeoutException &sick_timeout_exception) {
@@ -938,6 +937,116 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		}
 
   }
+
+  void SickNav350::SetCurrentLayer(uint16_t layer){
+
+	  std::cout << "\t\tSet Layer : " << layer << std::endl;
+	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	  int count=0;
+	  std::string command_type=this->WRITEBYNAME_COMMAND;
+	  std::string command=this->CURLAYER_COMMAND;
+	  for (int i=0;i<command_type.length();i++)
+	  {
+		  payload_buffer[count]=command_type[i];
+		  count++;
+	  }
+	  payload_buffer[count]=' ';
+	  count++;
+	  for (int i=0;i<command.length();i++)
+	  {
+		  payload_buffer[count]=command[i];
+		  count++;
+	  }
+	  payload_buffer[count]=' ';
+	  count++;
+	  payload_buffer[count]=48+layer;
+	  count++;
+
+	  SickNav350Message send_message(payload_buffer,count);
+	  SickNav350Message recv_message;
+
+	  try {
+		  _sendMessageAndGetReply(send_message,recv_message);
+		  //_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+		  //sick_nav350_sector_data_t.
+		  //	      _SplitReceivedMessage(recv_message);
+	  }
+
+	  catch(SickTimeoutException &sick_timeout_exception) {
+		  std::cerr << "sick_timeout_exception" << std::endl;
+
+		  throw;
+	  }
+
+	  catch(SickIOException &sick_io_exception) {
+		  std::cerr << "sick_io_exception" << std::endl;
+		  throw;
+	  }
+
+	  catch(...) {
+		  std::cerr << "SickNav350::_set current layer - Unknown exception!" << std::endl;
+		  throw;
+	  }
+
+  }
+
+  void SickNav350::SetPoseDataFormat(uint8_t outputMode, uint8_t showOptParam){
+
+	  std::cout << "\t\tSet Pose Data Format : " << outputMode << " " << showOptParam << std::endl;
+	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	  int count=0;
+	  std::string command_type=this->WRITEBYNAME_COMMAND;
+	  std::string command=this->POSDATAFORMAT_COMMAND;
+	  for (int i=0;i<command_type.length();i++)
+	  {
+		  payload_buffer[count]=command_type[i];
+		  count++;
+	  }
+
+	  payload_buffer[count]=' ';
+	  count++;
+	  for (int i=0;i<command.length();i++)
+	  {
+		  payload_buffer[count]=command[i];
+		  count++;
+	  }
+	  payload_buffer[count]=' ';
+	  count++;
+	  payload_buffer[count]=48+outputMode;
+	  count++;
+	  payload_buffer[count]=' ';
+	  count++;
+	  payload_buffer[count]=48+showOptParam;
+	  count++;
+
+	  SickNav350Message send_message(payload_buffer,count);
+	  SickNav350Message recv_message;
+
+	  try {
+		  _sendMessageAndGetReply(send_message,recv_message);
+		  //_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+		  //sick_nav350_sector_data_t.
+		  //	      _SplitReceivedMessage(recv_message);
+	  }
+
+	  catch(SickTimeoutException &sick_timeout_exception) {
+		  std::cerr << "sick_timeout_exception" << std::endl;
+
+		  throw;
+	  }
+
+	  catch(SickIOException &sick_io_exception) {
+		  std::cerr << "sick_io_exception" << std::endl;
+		  throw;
+	  }
+
+	  catch(...) {
+		  std::cerr << "SickNav350::_set current layer - Unknown exception!" << std::endl;
+		  throw;
+	  }
+
+  }
+
 
   void SickNav350::SetScanDataFormat (uint8_t dataMode, uint8_t showRSSI)throw( SickIOException, SickTimeoutException, SickErrorException )
   {
@@ -1008,7 +1117,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
   void SickNav350::SetAccessMode( uint8_t newMode) throw(SickIOException, SickTimeoutException, SickErrorException)
   {
-	  std::cout<<"set access mode: " << newMode<<std::endl;
 	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
 	  int count=0;
 	  std::string command_type=this->METHODCALL_COMMAND;
@@ -1059,7 +1167,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		  //sick_nav350_sector_data_t.
 		  //	      _SplitReceivedMessage(recv_message);
 
-		  std::cout<<"Set access mode response:" <<std::endl;
 		  //recv_message.Print();
 	  }
 
@@ -1081,7 +1188,7 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
   }
 
-  void SickNav350::GetData(int wait,int dataset)
+  void SickNav350::GetPoseData(int wait,int dataset)
   {
 	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
 	  int count=0;
@@ -1121,11 +1228,8 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	    try {
 	      _sendMessageAndGetReply(send_message,recv_message);
 	      _recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
-	      //sick_nav350_sector_data_t.=0;
 	      _SplitReceivedMessage(recv_message);
-//	      std::cout<<"argument count="<<argumentcount_<<std::endl;
 	      _ParseScanData();
-//	      std::cout<<"Get data"<<std::endl;
 	    }
 
 	    catch(SickTimeoutException &sick_timeout_exception) {

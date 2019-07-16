@@ -101,6 +101,12 @@ namespace SickToolbox {
 
     if(new_ack.compare("sMN") == 0){
       ack_str = "REQUEST METHOD";
+      str.erase(0, str.find(delimiter) + delimiter.length());
+
+      //result = str.substr(0, str.find(delimiter));
+      result = str;
+
+
     }else if(new_ack.compare("sMA") == 0){
       ack_str = "ACKNOWLEDGE";
     }else if(new_ack.compare("sRN") == 0){
@@ -108,7 +114,13 @@ namespace SickToolbox {
 
     }else if(new_ack.compare("sWN") == 0){
       ack_str = "WRITE";
+      str.erase(0, str.find(delimiter) + delimiter.length());
+
+      //result = str.substr(0, str.find(delimiter));
+      result = str;
+
     }else if(new_ack.compare("sRA") == 0){
+
       ack_str = "RESPONSE";
       str.erase(0, str.find(delimiter) + delimiter.length());
 
@@ -119,8 +131,8 @@ namespace SickToolbox {
       ack_str = "RESULT";
       str.erase(0, str.find(delimiter) + delimiter.length());
 
-      result = str.substr(0, str.find(delimiter));
-      //result = str;
+      //result = str.substr(0, str.find(delimiter));
+      result = str;
 
     }else if(new_ack.compare("sWA") == 0){
       ack_str = "RESPONSE";
@@ -129,6 +141,10 @@ namespace SickToolbox {
       result = str.substr(0, str.find(delimiter));
       result = str;
 
+    }else if(new_ack.compare("sFA") == 0){
+      ack_str = "ERROR MESSAGE - Please check documentation for error description";
+      result = cmd;
+      cmd = "";
 
     }else{
       ack_str = "ERROR " + new_ack;
