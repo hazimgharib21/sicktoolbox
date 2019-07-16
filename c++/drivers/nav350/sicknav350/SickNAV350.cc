@@ -276,6 +276,26 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	  delete MeasuredData_;
   }
 
+  std::string SickNav350::GetSickName() const {
+	  return _sick_identity.sick_name;
+  }
+
+  std::string SickNav350::GetSickVersion( ) const {
+    return _sick_identity.sick_version;
+  }
+
+  std::string SickNav350::GetSickSerialNumber( ) const {
+    return _sick_identity.sick_serial_number;
+  }
+
+  std::string SickNav350::GetSickFirmwareVersion( ) const {
+    return _sick_identity.sick_firmware_version;
+  }
+
+  std::string SickNav350::GetSickSoftwareVersion( ) const {
+    return _sick_identity.sick_application_software_version;
+  }
+
   /**
    * \brief Acquire the current IP address of the Sick
    * \return The Sick Nav350 IP (Inet4) address
@@ -283,6 +303,13 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
   std::string SickNav350::GetSickIPAddress( ) const {
 
     /* Declare the string stream */
+	std::cout << "Getting Sick Ip address..." << std::endl;
+	std::cout << _sick_ethernet_config.sick_ip_address[0] << "."
+	       << _sick_ethernet_config.sick_ip_address[1] << "."
+	       << _sick_ethernet_config.sick_ip_address[2] << "."
+	       << _sick_ethernet_config.sick_ip_address[3] << std::endl;
+
+
     std::ostringstream str_stream;
 
     str_stream << _sick_ethernet_config.sick_ip_address[0] << "."
@@ -340,23 +367,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
   std::string SickNav350::GetSickPartNumber( ) const {
     return _sick_identity.sick_part_number;
   }
-
-  /**
-   * \brief Acquire the Sick Nav350's name
-   * \return The Sick Nav350 sensor name
-   */
-  std::string SickNav350::GetSickName( ) const {
-    return _sick_identity.sick_name;
-  }
-
-  /**
-   * \brief Acquire the Sick Nav350's version number
-   * \return The Sick Nav350 version number
-   */
-  std::string SickNav350::GetSickVersion( ) const {
-    return _sick_identity.sick_version;
-  }
-
 
   /**
    * \brief Establish a TCP connection to the unit
@@ -651,20 +661,27 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
   void SickNav350::GetSickIdentity()
   {
 	  _getSickIdentity();
+	  _getSickSerialNumber();
+	  _getSickFirmwareVersion();
+	  _getSickSoftwareVersion();
   }
+
   void SickNav350::_getSickIdentity( )
   {
 	    uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
 	    int count=0;
 	    std::string command_type=this->READBYNAME_COMMAND;
 	    std::string command=this->DEVICEIDENT_COMMAND;
+
 	    for (int i=0;i<command_type.length();i++)
 	    {
 	    	payload_buffer[count]=command_type[i];
 	    	count++;
 	    }
+
 	    payload_buffer[count]=' ';
 	    count++;
+
 	    for (int i=0;i<command.length();i++)
 	    {
 	    	payload_buffer[count]=command[i];
@@ -679,8 +696,10 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	    /* Send the message and check the reply */
 	    try {
 	      _sendMessageAndGetReply(send_message,recv_message);
-	      //sick_nav350_sector_data_t.
-	      std::cout<<"Receved Identity"<<std::endl;
+		  _SplitReceivedMessage(recv_message);
+
+		  _sick_identity.sick_name = arg[3];
+		  _sick_identity.sick_version = arg[5];
 	    }
 
 	    catch(SickTimeoutException &sick_timeout_exception) {
@@ -700,6 +719,165 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	    }
 
   }
+
+  void SickNav350::_getSickSerialNumber( )
+  {
+	    uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	    int count=0;
+	    std::string command_type=this->READBYNAME_COMMAND;
+	    std::string command=this->SERIALNUMBER_COMMAND;
+
+	    for (int i=0;i<command_type.length();i++)
+	    {
+	    	payload_buffer[count]=command_type[i];
+	    	count++;
+	    }
+
+	    payload_buffer[count]=' ';
+	    count++;
+
+	    for (int i=0;i<command.length();i++)
+	    {
+	    	payload_buffer[count]=command[i];
+	    	count++;
+	    }
+
+	    /* Create the Sick messages */
+	    SickNav350Message send_message(payload_buffer,count);
+	    SickNav350Message recv_message;
+
+	    /* Send the message and check the reply */
+	    try {
+	      _sendMessageAndGetReply(send_message,recv_message);
+		  _SplitReceivedMessage(recv_message);
+
+		  _sick_identity.sick_serial_number = arg[3];
+	    }
+
+	    catch(SickTimeoutException &sick_timeout_exception) {
+	      std::cerr << "sick_timeout_exception" << std::endl;
+
+	      throw;
+	    }
+
+	    catch(SickIOException &sick_io_exception) {
+	      std::cerr << "sick_io_exception" << std::endl;
+	      throw;
+	    }
+
+	    catch(...) {
+	      std::cerr << "SickNav350::_getSickStatus - Unknown exception!" << std::endl;
+	      throw;
+	    }
+
+  }
+
+  void SickNav350::_getSickFirmwareVersion( )
+  {
+	    uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	    int count=0;
+	    std::string command_type=this->READBYNAME_COMMAND;
+	    std::string command=this->DEVICEINFO_COMMAND;
+
+	    for (int i=0;i<command_type.length();i++)
+	    {
+	    	payload_buffer[count]=command_type[i];
+	    	count++;
+	    }
+
+	    payload_buffer[count]=' ';
+	    count++;
+
+	    for (int i=0;i<command.length();i++)
+	    {
+	    	payload_buffer[count]=command[i];
+	    	count++;
+	    }
+
+
+	    /* Create the Sick messages */
+	    SickNav350Message send_message(payload_buffer,count);
+	    SickNav350Message recv_message;
+
+	    /* Send the message and check the reply */
+	    try {
+	      _sendMessageAndGetReply(send_message,recv_message);
+		  _SplitReceivedMessage(recv_message);
+
+		  _sick_identity.sick_firmware_version = arg[2];
+	    }
+
+	    catch(SickTimeoutException &sick_timeout_exception) {
+	      std::cerr << "sick_timeout_exception" << std::endl;
+
+	      throw;
+	    }
+
+	    catch(SickIOException &sick_io_exception) {
+	      std::cerr << "sick_io_exception" << std::endl;
+	      throw;
+	    }
+
+	    catch(...) {
+	      std::cerr << "SickNav350::_getSickStatus - Unknown exception!" << std::endl;
+	      throw;
+	    }
+
+  }
+
+  void SickNav350::_getSickSoftwareVersion( )
+  {
+	    uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	    int count=0;
+	    std::string command_type=this->READBYNAME_COMMAND;
+	    std::string command=this->FIRMWAREVERSION_COMMAND;
+
+	    for (int i=0;i<command_type.length();i++)
+	    {
+	    	payload_buffer[count]=command_type[i];
+	    	count++;
+	    }
+
+	    payload_buffer[count]=' ';
+	    count++;
+
+	    for (int i=0;i<command.length();i++)
+	    {
+	    	payload_buffer[count]=command[i];
+	    	count++;
+	    }
+
+
+	    /* Create the Sick messages */
+	    SickNav350Message send_message(payload_buffer,count);
+	    SickNav350Message recv_message;
+
+	    /* Send the message and check the reply */
+	    try {
+	      _sendMessageAndGetReply(send_message,recv_message);
+		  _SplitReceivedMessage(recv_message);
+
+		  _sick_identity.sick_application_software_version = arg[3];
+	    }
+
+	    catch(SickTimeoutException &sick_timeout_exception) {
+	      std::cerr << "sick_timeout_exception" << std::endl;
+
+	      throw;
+	    }
+
+	    catch(SickIOException &sick_io_exception) {
+	      std::cerr << "sick_io_exception" << std::endl;
+	      throw;
+	    }
+
+	    catch(...) {
+	      std::cerr << "SickNav350::_getSickStatus - Unknown exception!" << std::endl;
+	      throw;
+	    }
+
+  }
+
   void SickNav350::SetOperatingMode(int mode)
   {
 	  std::cout<<"set operating_mode_command"<<std::endl;
@@ -1049,6 +1227,8 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		  str=str+(char) message[i];
 
 	  }
+	  arg[argumentcount_] = str;
+
 	  delete []message;
   }
   void SickNav350::_ParseScanData()

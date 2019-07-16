@@ -19,7 +19,7 @@
 /* Implementation dependencies */
 #include <iomanip>
 #include <iostream>
-#include <arpa/inet.h> 
+#include <arpa/inet.h>
 #include <sstream>
 #include <iterator>
 #include <map>
@@ -38,9 +38,9 @@ namespace SickToolbox {
     SickMessage< SICK_NAV350_MSG_HEADER_LEN, SICK_NAV350_MSG_PAYLOAD_MAX_LEN, SICK_NAV350_MSG_TRAILER_LEN >()  {
 
     /* Initialize the object */
-    Clear(); 
+    Clear();
   }
-  
+
   /**
    * \brief Another constructor.
    * \param *payload_buffer The payload for the packet as an array of bytes (including the header)
@@ -50,9 +50,9 @@ namespace SickToolbox {
     SickMessage< SICK_NAV350_MSG_HEADER_LEN, SICK_NAV350_MSG_PAYLOAD_MAX_LEN, SICK_NAV350_MSG_TRAILER_LEN >()  {
 
     /* Build the message object (implicit initialization) */
-    BuildMessage(payload_buffer,payload_length); 
+    BuildMessage(payload_buffer,payload_length);
   }
-  
+
   /**
    * \brief Constructs a Sick Nav350 message given parameter values
    * \param *payload_buffer An address of the first byte to be copied into the message's payload
@@ -66,12 +66,12 @@ namespace SickToolbox {
      */
     SickMessage< SICK_NAV350_MSG_HEADER_LEN, SICK_NAV350_MSG_PAYLOAD_MAX_LEN, SICK_NAV350_MSG_TRAILER_LEN >
       ::BuildMessage(payload_buffer,payload_length);
-    
+
     /*
      * Set the message header!
      */
     _message_buffer[0] = 0x02; // STX
-    
+
 
     /*
      * Set the message trailer (just a checksum)!
@@ -89,7 +89,7 @@ namespace SickToolbox {
     std::string cmd = str.substr(0, str.find(delimiter));
     std::string result = "";
 
-   
+
     char ack_arr[ack.length() + 1];
     strcpy(ack_arr, ack.c_str());
     for(int i = 0; i < ack.length(); i++){
@@ -100,37 +100,46 @@ namespace SickToolbox {
     std::string new_ack(ack_arr, 3);
 
     if(new_ack.compare("sMN") == 0){
-      ack_str = "REQUEST";
+      ack_str = "REQUEST METHOD";
     }else if(new_ack.compare("sMA") == 0){
       ack_str = "ACKNOWLEDGE";
+    }else if(new_ack.compare("sRN") == 0){
+      ack_str = "REQUEST READ";
+
+    }else if(new_ack.compare("sWN") == 0){
+      ack_str = "WRITE";
+    }else if(new_ack.compare("sRA") == 0){
+      ack_str = "RESPONSE";
+      str.erase(0, str.find(delimiter) + delimiter.length());
+
+      result = str.substr(0, str.find(delimiter));
+      result = str;
+
     }else if(new_ack.compare("sAN") == 0){
       ack_str = "RESULT";
       str.erase(0, str.find(delimiter) + delimiter.length());
 
       result = str.substr(0, str.find(delimiter));
       //result = str;
-      
 
-    }else if(new_ack.compare("sWN") == 0){
-      ack_str = "WRITE";
     }else if(new_ack.compare("sWA") == 0){
       ack_str = "RESPONSE";
       str.erase(0, str.find(delimiter) + delimiter.length());
 
       result = str.substr(0, str.find(delimiter));
       result = str;
-      
+
 
     }else{
       ack_str = "ERROR " + new_ack;
     }
-    
+
     std::cout << "TYPE : " << ack_str << std::endl;
     std::cout << "CMD : " << cmd << std::endl;
     std::cout << "RESULT : " << result << "\n" << std::endl;
 
 
-    
+
     //std::cout << str << std::endl;
 /*
     for (int i=0;i<_message_length;i++)
@@ -141,7 +150,7 @@ namespace SickToolbox {
 
 
   }
-  
+
   /**
    * \brief Print the message contents.
    */
@@ -153,30 +162,30 @@ namespace SickToolbox {
     std::cout << std::flush;
 
     /* Call parent's print function */
-    SickMessage< SICK_NAV350_MSG_HEADER_LEN, SICK_NAV350_MSG_PAYLOAD_MAX_LEN, SICK_NAV350_MSG_TRAILER_LEN >::Print();    
+    SickMessage< SICK_NAV350_MSG_HEADER_LEN, SICK_NAV350_MSG_PAYLOAD_MAX_LEN, SICK_NAV350_MSG_TRAILER_LEN >::Print();
   }
-  
+
   /**
    * \brief Compute the message checksum (single-byte XOR).
    * \param data The address of the first data element in a sequence of bytes to be included in the sum
    * \param length The number of byte in the data sequence
    */
   uint8_t SickNav350Message::_computeXOR( const uint8_t * const data, const uint32_t length ) {
-    
+
     /* Compute the XOR by summing all of the bytes */
     uint8_t checksum = 0;
     for (uint32_t i = 0; i < length; i++) {
       checksum ^= data[i]; // NOTE: this is equivalent to simply summing all of the bytes
     }
-    
+
     /* done */
     return checksum;
   }
   void SickNav350Message::ParseMessage( const uint8_t * const message_buffer )
   {
-  
+
   }
 
   SickNav350Message::~SickNav350Message( ) { }
-  
+
 } /* namespace SickToolbox */

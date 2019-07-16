@@ -42,53 +42,6 @@ target_link_libraries(SickLMS2xx ${catkin_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 add_library(SickNAV350 c++/drivers/nav350/sicknav350/SickNAV350.cc c++/drivers/nav350/sicknav350/SickNAV350BufferMonitor.cc c++/drivers/nav350/sicknav350/SickNAV350Message.cc)
 target_link_libraries(SickNAV350 ${catkin_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-# Examples
-add_library(LDConfigLib c++/examples/ld/ld_config/src/ConfigFile.cpp)
-add_executable(ld_config c++/examples/ld/ld_config/src/main.cc)
-target_link_libraries(ld_config SickLD LDConfigLib ${catkin_LIBRARIES})
-
-add_executable(ld_more_config c++/examples/ld/ld_more_config/src/main.cc)
-target_link_libraries(ld_more_config SickLD ${catkin_LIBRARIES})
-
-add_executable(ld_multi_sector c++/examples/ld/ld_multi_sector/src/main.cc)
-target_link_libraries(ld_multi_sector SickLD ${catkin_LIBRARIES})
-
-add_executable(ld_single_sector c++/examples/ld/ld_single_sector/src/main.cc)
-target_link_libraries(ld_single_sector SickLD ${catkin_LIBRARIES})
-
-add_executable(lms1xx_simple_app c++/examples/lms1xx/lms1xx_simple_app/src/main.cc)
-target_link_libraries(lms1xx_simple_app SickLMS1xx ${catkin_LIBRARIES})
-
-add_executable(lms2xx_config c++/examples/lms2xx/lms2xx_config/src/main.cc)
-target_link_libraries(lms2xx_config SickLMS2xx ${catkin_LIBRARIES})
-
-add_executable(lms2xx_mean_values c++/examples/lms2xx/lms2xx_mean_values/src/main.cc)
-target_link_libraries(lms2xx_mean_values SickLMS2xx ${catkin_LIBRARIES})
-
-add_executable(lms2xx_partial_scan c++/examples/lms2xx/lms2xx_partial_scan/src/main.cc)
-target_link_libraries(lms2xx_partial_scan SickLMS2xx ${catkin_LIBRARIES})
-
-add_executable(lms2xx_real_time_indices c++/examples/lms2xx/lms2xx_real_time_indices/src/main.cc)
-target_link_libraries(lms2xx_real_time_indices SickLMS2xx ${catkin_LIBRARIES})
-
-add_executable(lms2xx_set_variant c++/examples/lms2xx/lms2xx_set_variant/src/main.cc)
-target_link_libraries(lms2xx_set_variant SickLMS2xx ${catkin_LIBRARIES})
-
-add_executable(lms2xx_simple_app c++/examples/lms2xx/lms2xx_simple_app/src/main.cc)
-target_link_libraries(lms2xx_simple_app SickLMS2xx ${catkin_LIBRARIES})
-
-add_executable(lms2xx_stream_range_and_reflect c++/examples/lms2xx/lms2xx_stream_range_and_reflect/src/main.cc)
-target_link_libraries(lms2xx_stream_range_and_reflect SickLMS2xx ${catkin_LIBRARIES})
-
-add_executable(lms2xx_subrange c++/examples/lms2xx/lms2xx_subrange/src/main.cc)
-target_link_libraries(lms2xx_subrange SickLMS2xx ${catkin_LIBRARIES})
-
-add_executable(nav350_server c++/examples/nav350/nav350_server/src/main.cc c++/examples/nav350/nav350_server/src/server.cc)
-target_link_libraries(nav350_server SickNAV350 ${catkin_LIBRARIES})
-
-add_executable(NAV350_single_sector c++/examples/nav350/nav350_single_sector/src/main.cc)
-target_link_libraries(NAV350_single_sector SickNAV350 ${catkin_LIBRARIES})
-
 #############
 ## Install ##
 #############
@@ -104,10 +57,10 @@ target_link_libraries(NAV350_single_sector SickNAV350 ${catkin_LIBRARIES})
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS SickLD SickLMS1xx SickLMS2xx SickNAV350 LDConfigLib ld_config 
-  ld_more_config ld_multi_sector ld_single_sector lms1xx_simple_app 
-  lms2xx_config lms2xx_mean_values lms2xx_partial_scan lms2xx_real_time_indices 
-  lms2xx_set_variant lms2xx_simple_app lms2xx_stream_range_and_reflect lms2xx_subrange
+install(TARGETS SickLD SickLMS1xx SickLMS2xx SickNAV350  
+  #  ld_more_config ld_multi_sector ld_single_sector lms1xx_simple_app 
+  #lms2xx_config lms2xx_mean_values lms2xx_partial_scan lms2xx_real_time_indices 
+  #lms2xx_set_variant lms2xx_simple_app lms2xx_stream_range_and_reflect lms2xx_subrange
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

@@ -349,6 +349,67 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     /** Acquire the Sick LD's version number */
     std::string GetSickVersion( ) const;
 
+    std::string GetSickSerialNumber( ) const;
+    std::string GetSickFirmwareVersion( ) const;
+    std::string GetSickSoftwareVersion( ) const;
+
+    void SetCurrentLayer(uint16_t layer);
+    std::string GetCurrentLayer();
+    void SetReflectorWindow(uint16_t winLow, uint16_t winHigh, uint32_t distLow, uint32_t distHigh);
+    std::string GetReflectorWindow();
+    void SetMappingConfiguration(uint8_t mean, bool negative, int x, int y, int phi);
+    std::string GetMappingConfiguration();
+    void SetSlidingMean(uint8_t mean);
+    std::string GetSlidingMean();
+    void SetPoseDataFormat(bool outputMode, bool showOptParam);
+    std::string GetPoseDataFormat();
+    void SetLandmarkDataFormat(bool format, bool showOptParam, int landmarkFilter);
+    std::string GetLandmarkDataFormat();
+    std::string GetScanDataFormat();
+    void SetTimeSync(uint8_t mode, uint8_t mask);
+    std::string GetTimeSync();
+    void SetReflectorSize(uint16_t size);
+    std::string GetReflectorSize();
+    void SetReflectorType(uint8_t type);
+    std::string GetReflectorType();
+    void SetLandmarkMatching(uint8_t filter);
+    std::string GetLandmarkMatching();
+    void SetSectorMuting(uint32_t angleFrom_0, uint32_t angleTo_0, bool isActive_0,uint32_t angleFrom_1, uint32_t angleTo_1, bool isActive_1,uint32_t angleFrom_2, uint32_t angleTo_2, bool isActive_2,uint32_t angleFrom_3, uint32_t angleTo_3, bool isActive_3);
+    std::string GetMutedSectors();
+    void SetCoordinateOrientation(uint8_t dir);
+    std::string GetCoordinateOrientation();
+    void SetNClosestReflectors(uint8_t num);
+    std::string GetNClosestReflectors();
+    void SetActionRadius(uint32_t min, uint32_t max);
+    std::string GetActionRadius();
+    void SetReflectorThreshold(uint8_t percent);
+    std::string GetReflectorThreshold();
+    void SetDataPermenant();
+    void SyncTimeStamp();
+    void BreakAsyncCall();
+    void ResetDevice();
+    void SetSerialConfig(uint8_t baudrate, uint8_t dataBits, uint8_t parity, uint8_t stopBits);
+    void SetIPConfig(uint8_t ipAddress, uint8_t subnetMask, uint8_t gateway);
+    void SetEthConfig(uint8_t speedDuplex);
+    void EnableDHCP(bool isEnable);
+    void AddLandmark(uint16_t num, int x, int y, uint8_t lmType, uint8_t reflectorType, uint16_t size, uint16_t layer, uint16_t layerID);
+    void EditLandmark(uint16_t num, uint16_t id, int x, int y, uint8_t lmType, uint8_t reflectorType, uint16_t size, uint16_t layer, uint16_t layerID);
+    void DeleteLandmark(uint16_t num, uint16_t id);
+    void GetLandmark(uint16_t num, uint16_t id);
+    void GetLayer(uint16_t id);
+    void GetLayout();
+    void EraseLayout(uint8_t mem);
+    void SaveLayout();
+    void DoMapping();
+    void GetLandmarkData(bool useNewLandmark, uint8_t dataFormat);
+    void GetPose(bool wait);
+    void GetPoseNScan(bool wait, uint8_t data);
+    void SetSpeed(double x, double y, double phi, int timestamp, int coordbase);
+    void SetPose(double x, double y, double phi);
+    void SetPoseID(uint16_t id);
+
+
+
     /** Get Sick Identity */
     void GetSickIdentity();
     /** Change to navigation mode */
@@ -379,7 +440,6 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     /**Send custom message and get response*/
     void GetResponseFromCustomMessage(uint8_t *req,int req_size,uint8_t *res,int *res_size);
 
-    void SetSpeed(double x, double y, double phi, int timestamp, int coordbase);
 
 
     /** Destructor */
@@ -400,7 +460,6 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
     /** Sick LD socket address structure */
     struct sockaddr_in _sick_inet_address_info;
-
 
     /** Indicates whether the Sick LD is currently streaming range data */
     bool _sick_streaming_range_data;
@@ -464,6 +523,10 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
 
     /** Stores an image of the Sick LD's identity locally */
      void _getSickIdentity( ) /*throw( SickTimeoutException, SickIOException )*/;
+
+     void _getSickSerialNumber();
+     void _getSickFirmwareVersion();
+     void _getSickSoftwareVersion();
 
     /** Query the Sick for its sensor and motor status */
     void _getSickStatus( ) throw( SickTimeoutException, SickIOException );
@@ -540,11 +603,8 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     void _setSickSignals( const uint8_t sick_signal_flags = DEFAULT_SICK_SIGNAL_SET )
       throw( SickIOException, SickTimeoutException, SickErrorException );
 
-
-
     /** Flushed the TCP receive buffer */
     void _flushTCPRecvBuffer( ) throw ( SickIOException, SickThreadException );
-
 
     /** Generates a device-ready sector set given only an active sector spec. */
     void _generateSickSectorConfig( const double * const active_sector_start_angles,
