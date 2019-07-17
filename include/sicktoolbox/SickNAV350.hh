@@ -382,7 +382,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     std::string GetCoordinateOrientation();
     void SetNClosestReflectors(uint8_t num);
     std::string GetNClosestReflectors();
-    void SetActionRadius(uint32_t min, uint32_t max);
+    void SetActionRadius(int min, int max);
     std::string GetActionRadius();
     void SetReflectorThreshold(uint8_t percent);
     std::string GetReflectorThreshold();
