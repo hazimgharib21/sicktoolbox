@@ -270,11 +270,22 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
     /* Success */
   }
 
-  void SickNav350::Uninitialize( )
+  void SickNav350::Uninitialize( ) throw (SickIOException, SickThreadException, SickTimeoutException, SickErrorException)
   {
-	  delete []arg;
-	  delete MeasuredData_;
-  }
+	  if(!_sick_initialized){
+
+		  throow SickIOException("SickNAV350::Uninitialize - Device NOT Initialized!!!");
+	  }
+	  std::cout << std::endl << "\t*** Attempting to uninitialize the Sick NAV350..." << std::endl;
+
+	  try{
+
+	  	delete []arg;
+	  	delete MeasuredData_;
+
+		std::cout << "\tSetting NAV350 to idle mode..." << std::endl;
+	  }
+ }
 
   std::string SickNav350::GetSickName() const {
 	  return _sick_identity.sick_name;
@@ -2130,18 +2141,12 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
 	    /* Send the message and check the reply */
 	    try {
-//		      std::cout<<"before first message"<<std::endl;
 
  	      _sendMessageAndGetReply(send_message,recv_message);
-//	      std::cout<<"first message"<<std::endl;
 	      _recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
-//	      std::cout<<"second message"<<std::endl;
 
-	      //sick_nav350_sector_data_t.=0;
 	      _SplitReceivedMessage(recv_message);
-//	       std::cout<<"argument count="<<argumentcount_<<std::endl;
 	      _ParseScanDataNavigation();
-//	      std::cout<<"Get data"<<std::endl;
 	    }
 
 	    catch(SickTimeoutException &sick_timeout_exception) {
@@ -2394,7 +2399,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 			  }
 
 		  }
-//		  for ()
 	  }
 
 	  switch (atoi(arg[count++].c_str()))
@@ -2403,7 +2407,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		  std::cout<<"No scan data"<<std::endl;
 		  break;
 	  case 1:
-//		  std::cout<<"One output channel"<<std::endl;
 		  if (arg[count++]=="DIST1")
 		  {
 			  count++; //scalefactor=1
