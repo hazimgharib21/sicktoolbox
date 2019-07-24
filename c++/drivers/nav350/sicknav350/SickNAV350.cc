@@ -40,7 +40,8 @@
 #include "sicktoolbox/SickNAV350Message.hh"
 #include "sicktoolbox/SickNAV350BufferMonitor.hh"
 #include "sicktoolbox/SickNAV350Utility.hh"
- #include "sicktoolbox/SickException.hh"
+#include "sicktoolbox/SickException.hh"
+
 using namespace std;
 /* Associate the namespace */
 namespace SickToolbox {
@@ -270,21 +271,54 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
     /* Success */
   }
 
-  void SickNav350::Uninitialize( ) throw (SickIOException, SickThreadException, SickTimeoutException, SickErrorException)
-  {
-	  if(!_sick_initialized){
+	void SickNav350::Uninitialize( ) throw (SickIOException, SickThreadException, SickTimeoutException, SickErrorException)
+	{
+		if(!_sick_initialized){
 
-		  throow SickIOException("SickNAV350::Uninitialize - Device NOT Initialized!!!");
-	  }
-	  std::cout << std::endl << "\t*** Attempting to uninitialize the Sick NAV350..." << std::endl;
+			throw SickIOException("SickNAV350::Uninitialize - Device NOT Initialized!!!");
+		}
+		std::cout << std::endl << "\t*** Attempting to uninitialize the Sick NAV350..." << std::endl;
 
-	  try{
+		try{
 
-	  	delete []arg;
-	  	delete MeasuredData_;
+			delete []arg;
+			delete MeasuredData_;
 
-		std::cout << "\tSetting NAV350 to idle mode..." << std::endl;
-	  }
+			std::cout << "\tSetting NAV350 to idle mode..." << std::endl;
+			_setSickSensorMode(1);
+			std::cout << "\t\tSick NAV350 is now idle!" << std::endl;
+
+			std::cout << "\tAttempting to cancel buffer monitor..." << std::endl;
+			_stopListening();
+			std::cout << "\t\tBuffer monitor canceled!" << std::endl;
+
+			std::cout << "\tClosing connection to Sick NAV350..." << std::endl;
+			_teardownConnection();
+			std::cout << "\tConnection to Sick NAV350 closed." << std::endl;
+
+		}catch(SickIOException &sick_io_exception){
+
+			std::cerr << sick_io_exception.what() << std::endl;
+			throw;
+
+		}catch(SickThreadException &sick_thread_exception){
+
+			std::cerr << sick_thread_exception.what() << std::endl;
+			throw;
+
+		}catch(SickTimeoutException &sick_timeout_exception){
+
+			std::cerr << sick_timeout_exception.what() << std::endl;
+			throw;
+
+		}catch(...){
+
+			std::cerr << "SickNav350::Uninitialize - Unknown exception!" << std::endl;
+			throw;
+
+		}
+
+		_sick_initialized = false;
  }
 
   std::string SickNav350::GetSickName() const {
@@ -909,8 +943,14 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	    }
 	    payload_buffer[count]=' ';
 	    count++;
-	    payload_buffer[count]=48+mode;
-	    count++;
+		char c[100];
+		sprintf(c, "%x",(int)(mode));
+		for(int i = 0; i < strlen(c); i++){
+
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+
+		}
 
 	    /* Create the Sick messages */
 	    SickNav350Message send_message(payload_buffer,count);
@@ -923,35 +963,33 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
 	    /* Send the message and check the reply */
 	    try {
-			std::cout << "\t\tSet Mode : " << mode << std::endl;
-	      _sendMessageAndGetReply(send_message,recv_message);
-	      _recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
-	      //sick_nav350_sector_data_t.
-	      //_SplitReceivedMessage(recv_message);
+			_sendMessageAndGetReply(send_message,recv_message);
+			_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+			//sick_nav350_sector_data_t.
+			//_SplitReceivedMessage(recv_message);
 
 	    }
 
 	    catch(SickTimeoutException &sick_timeout_exception) {
-	      std::cerr << "sick_timeout_exception" << std::endl;
+			std::cerr << "sick_timeout_exception" << std::endl;
 
-	      throw;
+			throw;
 	    }
 
 	    catch(SickIOException &sick_io_exception) {
-	      std::cerr << "sick_io_exception" << std::endl;
-	      throw;
+			std::cerr << "sick_io_exception" << std::endl;
+			throw;
 	    }
 
 	    catch(...) {
-	      std::cerr << "SickNav350::_set operating mode - Unknown exception!" << std::endl;
-	      throw;
+			std::cerr << "SickNav350::_set operating mode - Unknown exception!" << std::endl;
+			throw;
 		}
 
   }
 
   void SickNav350::SetCurrentLayer(uint16_t layer){
 
-	  std::cout << "\t\tSet Layer : " << layer << std::endl;
 	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
 	  int count=0;
 	  std::string command_type=this->WRITEBYNAME_COMMAND;
@@ -970,44 +1008,246 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	  }
 	  payload_buffer[count]=' ';
 	  count++;
-	  payload_buffer[count]=48+layer;
-	  count++;
+	  char c[100];
+	  sprintf(c, "%x",(int)(layer));
 
+		for(int i = 0; i < strlen(c); i++){
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+		}
 	  SickNav350Message send_message(payload_buffer,count);
 	  SickNav350Message recv_message;
 
 	  try {
-		  _sendMessageAndGetReply(send_message,recv_message);
-		  //_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
-		  //sick_nav350_sector_data_t.
-		  //	      _SplitReceivedMessage(recv_message);
+			_sendMessageAndGetReply(send_message,recv_message);
+			//_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+			//sick_nav350_sector_data_t.
+			//_SplitReceivedMessage(recv_message);
 	  }
 
 	  catch(SickTimeoutException &sick_timeout_exception) {
-		  std::cerr << "sick_timeout_exception" << std::endl;
 
+		  std::cerr << "sick_timeout_exception" << std::endl;
 		  throw;
+
 	  }
 
 	  catch(SickIOException &sick_io_exception) {
+
 		  std::cerr << "sick_io_exception" << std::endl;
 		  throw;
+
 	  }
 
 	  catch(...) {
+
 		  std::cerr << "SickNav350::_set current layer - Unknown exception!" << std::endl;
 		  throw;
+
 	  }
+
+  }
+
+  void SickNav350::SetMappingConfiguration(uint8_t mean, uint8_t negative, int x, int y, int phi){
+
+	uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	int count=0;
+	std::string command_type=this->WRITEBYNAME_COMMAND;
+	std::string command=this->CFGMAPPING_COMMAND;
+	for (int i=0;i<command_type.length();i++)
+	{
+		payload_buffer[count]=command_type[i];
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+	for (int i=0;i<command.length();i++)
+	{
+		payload_buffer[count]=command[i];
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+	char c[100];
+
+	sprintf(c, "%x",(int)(mean));
+
+	for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count] = toupper(c[i]);
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+
+	sprintf(c, "%x",(int)(negative));
+
+	for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count] = toupper(c[i]);
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+
+	sprintf(c, "%x",(int)(x));
+
+	for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count] = toupper(c[i]);
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+
+	sprintf(c, "%x",(int)(y));
+
+	for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count] = toupper(c[i]);
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+
+	sprintf(c, "%x",(int)(phi));
+
+	for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count] = toupper(c[i]);
+		count++;
+	}
+
+	/* Create the Sick messages */
+	SickNav350Message send_message(payload_buffer,count);
+	SickNav350Message recv_message;
+
+	//byte_sequence sAN mNMAPDoMapping (expected in response)
+	uint8_t byte_sequence[] = {115,65,78,32, 109, 78, 77, 65, 80, 68, 111, 77, 97, 112, 112, 105, 110, 103};//
+	int byte_sequence_length=18;
+	unsigned int mapping_timeout = 1e7;
+
+	/* Send the message and check the reply */
+	try {
+		_sendMessageAndGetReply(send_message,recv_message);
+		//_recvMessage(recv_message,byte_sequence,byte_sequence_length,mapping_timeout);
+		//sick_nav350_sector_data_t.
+		//_SplitReceivedMessage(recv_message);
+
+	}
+
+	catch(SickTimeoutException &sick_timeout_exception) {
+		std::cerr << "sick_timeout_exception" << std::endl;
+
+		throw;
+	}
+
+	catch(SickIOException &sick_io_exception) {
+		std::cerr << "sick_io_exception" << std::endl;
+		throw;
+	}
+
+	catch(...) {
+		std::cerr << "SickNav350::_set operating mode - Unknown exception!" << std::endl;
+		throw;
+	}
+
+  }
+
+  void SickNav350::DoMapping()
+  {
+	uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+	int count=0;
+	std::string command_type=this->METHODCALL_COMMAND;
+	std::string command=this->DOMAPPING_COMMAND;
+	for (int i=0;i<command_type.length();i++)
+	{
+		payload_buffer[count]=command_type[i];
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+	for (int i=0;i<command.length();i++)
+	{
+		payload_buffer[count]=command[i];
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+
+	/* Create the Sick messages */
+	SickNav350Message send_message(payload_buffer,count);
+	SickNav350Message recv_message;
+
+	//byte_sequence sAN mNMAPDoMapping (expected in response)
+	uint8_t byte_sequence[] = {115,65,78,32, 109, 78, 77, 65, 80, 68, 111, 77, 97, 112, 112, 105, 110, 103};//
+	int byte_sequence_length=18;
+	unsigned int mapping_timeout = 1e7;
+
+	/* Send the message and check the reply */
+	try {
+		_sendMessageAndGetReply(send_message,recv_message);
+		_recvMessage(recv_message,byte_sequence,byte_sequence_length,mapping_timeout);
+		//sick_nav350_sector_data_t.
+		_SplitReceivedMessage(recv_message);
+
+		ReflectorData_.error = atoi(arg[2].c_str());
+		ReflectorData_.landmarkDataFollow = atoi(arg[3].c_str());
+		if(ReflectorData_.landmarkDataFollow != 0){
+			ReflectorData_.filter = atoi(arg[4].c_str());
+			ReflectorData_.num_reflector = atoi(arg[5].c_str());
+			int refcount = ReflectorData_.num_reflector;
+			int count = 6;
+
+			for (int i = 0; i < refcount; i++){
+				ReflectorData_.cart[i] = atoi(arg[count++].c_str());
+				if(ReflectorData_.cart[i] != 0){
+					ReflectorData_.x[i] = _ConvertHexToDec(arg[count++]);
+					ReflectorData_.y[i] = _ConvertHexToDec(arg[count++]);
+					count++;
+					ReflectorData_.optional[i] = atoi(arg[count++].c_str());
+					ReflectorData_.LocalID[i] = _ConvertHexToDec(arg[count++]);
+					ReflectorData_.GlobalID[i] = _ConvertHexToDec(arg[count++]);
+					ReflectorData_.type[i] = atoi(arg[count++].c_str());
+					ReflectorData_.subtype[i] = atoi(arg[count++].c_str());
+					count++;
+					ReflectorData_.timestamp[i] = _ConvertHexToDec(arg[count++]);
+					ReflectorData_.size[i] = _ConvertHexToDec(arg[count++]);
+					ReflectorData_.hitCount[i] = _ConvertHexToDec(arg[count++]);
+					ReflectorData_.meanEchoAmplitude[i] = _ConvertHexToDec(arg[count++]);
+					ReflectorData_.indexStart[i] = _ConvertHexToDec(arg[count++]);
+					ReflectorData_.indexEnd[i] = _ConvertHexToDec(arg[count++]);
+				}
+
+			}
+		}
+	}
+
+	catch(SickTimeoutException &sick_timeout_exception) {
+
+		std::cerr << "sick_timeout_exception" << std::endl;
+		throw;
+
+	}
+
+	catch(SickIOException &sick_io_exception) {
+
+		std::cerr << "sick_io_exception" << std::endl;
+		throw;
+
+	}
+
+	catch(...) {
+
+		std::cerr << "SickNav350::_set operating mode - Unknown exception!" << std::endl;
+		throw;
+
+	}
 
   }
 
   void SickNav350::SetPoseDataFormat(uint8_t outputMode, uint8_t showOptParam){
 
-	  std::cout << "\t\tSet Pose Data Format : " << outputMode << " " << showOptParam << std::endl;
 	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
 	  int count=0;
 	  std::string command_type=this->WRITEBYNAME_COMMAND;
 	  std::string command=this->POSDATAFORMAT_COMMAND;
+
 	  for (int i=0;i<command_type.length();i++)
 	  {
 		  payload_buffer[count]=command_type[i];
@@ -1023,12 +1263,19 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	  }
 	  payload_buffer[count]=' ';
 	  count++;
-	  payload_buffer[count]=48+outputMode;
+	  char c[100];
+	  sprintf(c, "%x",(int)(outputMode));
+	  for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count]=toupper(c[i]);
+		count++;
+	  }
+  	  payload_buffer[count]=' ';
 	  count++;
-	  payload_buffer[count]=' ';
-	  count++;
-	  payload_buffer[count]=48+showOptParam;
-	  count++;
+	  sprintf(c, "%x",(int)(showOptParam));
+	  for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count]=toupper(c[i]);
+		count++;
+	  }
 
 	  SickNav350Message send_message(payload_buffer,count);
 	  SickNav350Message recv_message;
@@ -1057,7 +1304,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	  }
 
   }
-
 
   void SickNav350::SetScanDataFormat (uint8_t dataMode, uint8_t showRSSI)throw( SickIOException, SickTimeoutException, SickErrorException )
   {
@@ -1082,20 +1328,26 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	  }
 	  payload_buffer[count]=' ';
 	  count++;
-	  payload_buffer[count]=48+dataMode;
-	  count++;
+	  char c[100];
+	  sprintf(c, "%x", (int)(dataMode));
+	  for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count]=toupper(c[i]);
+		count++;
+	  }
 	  payload_buffer[count]=' ';
 	  count++;
-	  payload_buffer[count]=48+showRSSI;
-      count++;
+
+	  sprintf(c, "%x", (int)(showRSSI));
+	  for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count]=toupper(c[i]);
+		count++;
+	  }
 	  /* Create the Sick messages */
 	  SickNav350Message send_message(payload_buffer,count);
 	  SickNav350Message recv_message;
 
-
 	  uint8_t byte_sequence[] = {'s','W','A',' ','N','A','V','S','c','a','n','D','a','t','a','F','o','r','m','a','t'};
 	  int byte_sequence_length=21;
-
 
 	  /* Send the message and check the reply */
 	  try {
@@ -1126,7 +1378,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
   }
 
-
 	void SickNav350::SetReflectorType(uint8_t type){
 
 		uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
@@ -1149,10 +1400,10 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		count++;
 		char c[100];
 
-		sprintf(c, "%d",(int)(type));
+		sprintf(c, "%x",(int)(type));
 
 		for(int i = 0; i < strlen(c); i++){
-			payload_buffer[count] = c[i];
+			payload_buffer[count] = toupper(c[i]);
 			count++;
 		}
 
@@ -1213,10 +1464,10 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		count++;
 		char c[100];
 
-		sprintf(c, "%d",(int)(size));
+		sprintf(c, "%x",(int)(size));
 
 		for(int i = 0; i < strlen(c); i++){
-			payload_buffer[count] = c[i];
+			payload_buffer[count] = toupper(c[i]);
 			count++;
 		}
 
@@ -1275,20 +1526,20 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		count++;
 		char c[100];
 
-		sprintf(c, "%d",(int)(min));
+		sprintf(c, "%x",(int)(min));
 
 		for(int i = 0; i < strlen(c); i++){
-			payload_buffer[count] = c[i];
+			payload_buffer[count] = toupper(c[i]);
 			count++;
 		}
 
 		payload_buffer[count]=' ';
 		count++;
 
-		sprintf(c, "%d",(int)(max));
+		sprintf(c, "%x",(int)(max));
 
 		for(int i = 0; i < strlen(c); i++){
-			payload_buffer[count] = c[i];
+			payload_buffer[count] = toupper(c[i]);
 			count++;
 		}
 
@@ -1352,10 +1603,10 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		count++;
 		char c[100];
 
-		sprintf(c, "%d",(int)(filter));
+		sprintf(c, "%x",(int)(filter));
 
 		for(int i = 0; i < strlen(c); i++){
-			payload_buffer[count] = c[i];
+			payload_buffer[count] = toupper(c[i]);
 			count++;
 		}
 
@@ -1394,7 +1645,56 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	}
 
 
+	std::string SickNav350::GetReflectorWindow(){
 
+		uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+		int count=0;
+		std::string command_type=this->READBYNAME_COMMAND;
+		std::string command=this->IDENTWINDOW_COMMAND;
+		for (int i=0;i<command_type.length();i++)
+		{
+			payload_buffer[count]=command_type[i];
+			count++;
+		}
+		payload_buffer[count]=' ';
+		count++;
+		for (int i=0;i<command.length();i++)
+		{
+			payload_buffer[count]=command[i];
+			count++;
+		}
+		payload_buffer[count]=' ';
+		/* Create the Sick messages */
+		SickNav350Message send_message(payload_buffer,count);
+		SickNav350Message recv_message;
+
+		/* Send the message and check the reply */
+		try {
+			_sendMessageAndGetReply(send_message,recv_message);
+			//_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+			//sick_nav350_sector_data_t.
+			_SplitReceivedMessage(recv_message);
+			return (std::string)arg[0];
+
+			//recv_message.Print();
+		}
+
+		catch(SickTimeoutException &sick_timeout_exception) {
+			std::cerr << "sick_timeout_exception" << std::endl;
+
+			throw;
+		}
+
+		catch(SickIOException &sick_io_exception) {
+			std::cerr << "sick_io_exception" << std::endl;
+			throw;
+		}
+
+		catch(...) {
+			std::cerr << "SickNav350::- Unknown exception!" << std::endl;
+			throw;
+		}
+	}
 
 	void SickNav350::SetReflectorWindow(uint16_t winLow, uint16_t winHigh, uint32_t distLow, uint32_t distHigh){
 
@@ -1418,44 +1718,54 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		count++;
 		char c[100];
 
-		sprintf(c, "%d",(int)(winLow));
+		sprintf(c, "%x",(int)(winLow));
 
 		for(int i = 0; i < strlen(c); i++){
-			payload_buffer[count] = c[i];
+
+			payload_buffer[count] = toupper(c[i]);
 			count++;
+
+		}
+
+		payload_buffer[count]=' ';
+		count++;
+		sprintf(c, "%x",(int)(winHigh));
+
+		for(int i = 0; i < strlen(c); i++){
+
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+
 		}
 
 		payload_buffer[count]=' ';
 		count++;
 
-		sprintf(c, "%d",(int)(winHigh));
+		sprintf(c, "%x",(int)(distLow));
 
 		for(int i = 0; i < strlen(c); i++){
-			payload_buffer[count] = c[i];
-			count++;
-		}
 
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+
+		}
 
 		payload_buffer[count]=' ';
 		count++;
 
-		sprintf(c, "%d",(int)(distLow));
+		sprintf(c, "%x",(int)(distHigh));
 
 		for(int i = 0; i < strlen(c); i++){
-			payload_buffer[count] = c[i];
-			count++;
-		}
 
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+
+		}
 
 		payload_buffer[count]=' ';
 		count++;
 
-		sprintf(c, "%d",(int)(distHigh));
 
-		for(int i = 0; i < strlen(c); i++){
-			payload_buffer[count] = c[i];
-			count++;
-		}
 
 		/* Create the Sick messages */
 		SickNav350Message send_message(payload_buffer,count);
@@ -1510,7 +1820,7 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		count++;
 		char c[100];
 
-		sprintf(c, "%d",(int)(x*1000));
+		sprintf(c, "%d",(int)(x));
 
 		if(c[0] != '-'){
 
@@ -1529,7 +1839,7 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		payload_buffer[count] = ' ';
 		count++;
 
-		sprintf(c, "%d", (int)(y*1000));
+		sprintf(c, "%d", (int)(y));
 		if(c[0] != '-'){
 
 		payload_buffer[count] = '+';
@@ -1547,7 +1857,7 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		payload_buffer[count]=' ';
 		count++;
 
-		sprintf(c, "%d", (int)(phi/3.14159*180*1000));
+		sprintf(c, "%d", (int)(phi/3.14159*180));
 		if(c[0] != '-'){
 
 		payload_buffer[count] = '+';
@@ -2297,14 +2607,15 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 	  }
 	  std::cout<<std::endl;*/
 	  int count=0;
+	  PoseData_.error = atoi(arg[3].c_str());
 	  if (arg[3]!="0")
 	  {
-		  std::cout<<"Scan data unsuccessful"<<std::endl;
+		  //std::cout<<"Scan data unsuccessful"<<std::endl;
 		  return;
 	  }
 	  if (arg[5]<"1")
 	  {
-		 std::cout<<"Wrong selected signals"<<std::endl;
+		 //std::cout<<"Wrong selected signals"<<std::endl;
 		 return;
 	  }
 	  count=6;
@@ -2425,8 +2736,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 			  {
 				  MeasuredData_->range_values[i]=_ConvertHexToDec(arg[count++]);
 			  }
-//			  std::cout<<"Data read: "<<count<<std::endl;
-	//		  std::cout<<"data received "<<argumentcount_<<std::endl;
 
 		  }
 		  else

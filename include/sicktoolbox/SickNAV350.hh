@@ -56,7 +56,9 @@ namespace SickToolbox {
    *        Sick Nav350 long-range models via Ethernet.
    */
 struct sick_nav350_reflector_tag{
+  unsigned int error;
 	unsigned int filter;
+	unsigned int landmarkDataFollow;
 	unsigned int num_reflector;
 	unsigned int cart[SICK_MAX_NUM_REFLECTORS];
 	double x[SICK_MAX_NUM_REFLECTORS];
@@ -80,6 +82,7 @@ struct sick_nav350_reflector_tag{
 } ;
 
 struct sick_nav350_pose_tag{
+  unsigned int error;
 	int x;
   int y;
 	unsigned int phi;
@@ -299,7 +302,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     void Initialize( )  throw( SickIOException, SickThreadException, SickTimeoutException, SickErrorException );
 
     /** Initializes the Sick LD unit (use scan areas defined in flash) */
-    void Uninitialize( ) ;
+    void Uninitialize( ) throw (SickIOException, SickThreadException, SickTimeoutException, SickErrorException);
 
     /** Gets the sensor and motor mode of the unit */
     void GetSickStatus( unsigned int &sick_sensor_mode, unsigned int &sick_motor_mode )
@@ -359,7 +362,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     std::string GetCurrentLayer();
     void SetReflectorWindow(uint16_t winLow, uint16_t winHigh, uint32_t distLow, uint32_t distHigh);
     std::string GetReflectorWindow();
-    void SetMappingConfiguration(uint8_t mean, bool negative, int x, int y, int phi);
+    void SetMappingConfiguration(uint8_t mean, uint8_t negative, int x, int y, int phi);
     std::string GetMappingConfiguration();
     void SetSlidingMean(uint8_t mean);
     std::string GetSlidingMean();
