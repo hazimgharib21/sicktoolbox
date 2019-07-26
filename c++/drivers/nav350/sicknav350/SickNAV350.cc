@@ -1149,6 +1149,160 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
   }
 
+  void SickNav350::AddLandmark(uint16_t num, int data[][7]){
+	uint8_t payload_buffer[500] = {0};
+	int count=0;
+	std::string command_type=this->METHODCALL_COMMAND;
+	std::string command=this->ADDLANDMARK_COMMAND;
+	for (int i=0;i<command_type.length();i++)
+	{
+		payload_buffer[count]=command_type[i];
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+	for (int i=0;i<command.length();i++)
+	{
+		payload_buffer[count]=command[i];
+		count++;
+	}
+	payload_buffer[count]=' ';
+	count++;
+	char c[100];
+
+	sprintf(c, "%x", (int)(num));
+
+	for(int i = 0; i < strlen(c); i++){
+		payload_buffer[count] = toupper(c[i]);
+		count++;
+	}
+
+	for(int i = 0; i < num; i++){
+
+
+		payload_buffer[count] = ' ';
+		count++;
+
+		sprintf(c, "%d", (int)(data[i][0])); // x
+
+		std::cout << c << " ";
+		if(c[0] != '-'){
+			payload_buffer[count] = '+';
+			count++;
+		}
+
+		for(int k = 0; k < strlen(c); k++){
+			payload_buffer[count] = c[k];
+			count++;
+		}
+
+		payload_buffer[count] = ' ';
+		count++;
+
+		sprintf(c, "%d", (int)(data[i][1])); // y
+
+		std::cout << c << " ";
+		if(c[0] != '-'){
+			payload_buffer[count] = '+';
+			count++;
+		}
+
+		for(int k = 0; k < strlen(c); k++){
+			payload_buffer[count] = c[k];
+			count++;
+		}
+
+		payload_buffer[count] = ' ';
+		count++;
+
+
+		sprintf(c, "%d", (int)(data[i][2])); // type
+
+		std::cout << c << " ";
+		for(int k = 0; k < strlen(c); k++){
+			payload_buffer[count] = c[k];
+			count++;
+		}
+
+		payload_buffer[count] = ' ';
+		count++;
+
+
+		sprintf(c, "%d", (int)(data[i][3])); // subtype
+
+		std::cout << c << " ";
+		for(int k = 0; k < strlen(c); k++){
+			payload_buffer[count] = c[k];
+			count++;
+		}
+
+		payload_buffer[count] = ' ';
+		count++;
+
+		sprintf(c, "%d", (int)(data[i][4])); // size
+
+		std::cout << c << " ";
+		for(int k = 0; k < strlen(c); k++){
+			payload_buffer[count] = c[k];
+			count++;
+		}
+
+		payload_buffer[count] = ' ';
+		count++;
+
+		sprintf(c, "%d", (int)(data[i][5])); // layer
+
+		std::cout << c << " ";
+		for(int k = 0; k < strlen(c); k++){
+			payload_buffer[count] = c[k];
+			count++;
+		}
+
+		payload_buffer[count] = ' ';
+		count++;
+
+		sprintf(c, "%d", (int)(data[i][6])); // id
+
+		std::cout << c << " ";
+		for(int k = 0; k < strlen(c); k++){
+			payload_buffer[count] = toupper(c[k]);
+			count++;
+		}
+
+	}
+
+	std::cout << payload_buffer << std::endl;
+
+	  SickNav350Message send_message(payload_buffer,count);
+	  SickNav350Message recv_message;
+
+	  try {
+		  _sendMessageAndGetReply(send_message,recv_message);
+		  //_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+		  //sick_nav350_sector_data_t.
+		  //	      _SplitReceivedMessage(recv_message);
+	  }
+
+	  catch(SickTimeoutException &sick_timeout_exception) {
+		  std::cerr << "sick_timeout_exception" << std::endl;
+
+		  throw;
+	  }
+
+	  catch(SickIOException &sick_io_exception) {
+		  std::cerr << "sick_io_exception" << std::endl;
+		  throw;
+	  }
+
+	  catch(...) {
+		  std::cerr << "SickNav350::_set current layer - Unknown exception!" << std::endl;
+		  throw;
+	  }
+
+
+
+  }
+
   void SickNav350::DoMapping()
   {
 	uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};

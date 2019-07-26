@@ -397,7 +397,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     void SetIPConfig(uint8_t ipAddress, uint8_t subnetMask, uint8_t gateway);
     void SetEthConfig(uint8_t speedDuplex);
     void EnableDHCP(bool isEnable);
-    void AddLandmark(uint16_t num, int x, int y, uint8_t lmType, uint8_t reflectorType, uint16_t size, uint16_t layer, uint16_t layerID);
+    void AddLandmark(uint16_t num, int data[][7]);
     void EditLandmark(uint16_t num, uint16_t id, int x, int y, uint8_t lmType, uint8_t reflectorType, uint16_t size, uint16_t layer, uint16_t layerID);
     void DeleteLandmark(uint16_t num, uint16_t id);
     void GetLandmark(uint16_t num, uint16_t id);

@@ -42,6 +42,7 @@ target_link_libraries(SickLMS2xx ${catkin_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 add_library(SickNAV350 c++/drivers/nav350/sicknav350/SickNAV350.cc c++/drivers/nav350/sicknav350/SickNAV350BufferMonitor.cc c++/drivers/nav350/sicknav350/SickNAV350Message.cc)
 target_link_libraries(SickNAV350 ${catkin_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
+
 #############
 ## Install ##
 #############
@@ -57,9 +58,9 @@ target_link_libraries(SickNAV350 ${catkin_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS SickLD SickLMS1xx SickLMS2xx SickNAV350  
-  #  ld_more_config ld_multi_sector ld_single_sector lms1xx_simple_app 
-  #lms2xx_config lms2xx_mean_values lms2xx_partial_scan lms2xx_real_time_indices 
+install(TARGETS SickLD SickLMS1xx SickLMS2xx SickNAV350
+  #  ld_more_config ld_multi_sector ld_single_sector lms1xx_simple_app
+  #lms2xx_config lms2xx_mean_values lms2xx_partial_scan lms2xx_real_time_indices
   #lms2xx_set_variant lms2xx_simple_app lms2xx_stream_range_and_reflect lms2xx_subrange
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
