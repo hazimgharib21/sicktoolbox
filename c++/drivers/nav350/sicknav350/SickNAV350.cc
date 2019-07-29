@@ -1463,7 +1463,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
   {
 	  this->SetAccessMode(3);
 
-	  std::cout<<"set scan data format: " << dataMode<< ", " << showRSSI <<std::endl;
 	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
 	  int count=0;
 	  std::string command_type=this->WRITEBYNAME_COMMAND;
@@ -2901,6 +2900,15 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 		  std::cout<<"Two output channels"<<std::endl;
 		  break;
 	  }
+    if(arg[count++] == "1"){
+      count+=6;
+      uint16_t num_data = _ConvertHexToDec(arg[count++]);
+      for(int i = 0; i < num_data; i++){
+        MeasuredData_->echo_values[i]=_ConvertHexToDec(arg[count++]);
+      
+      }
+    
+    }
 
 
   }

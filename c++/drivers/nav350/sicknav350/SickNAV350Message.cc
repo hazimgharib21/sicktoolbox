@@ -150,9 +150,9 @@ namespace SickToolbox {
       ack_str = "ERROR " + new_ack;
     }
 
-    std::cout << "\nTYPE : " << ack_str << std::endl;
-    std::cout << "CMD : " << cmd << std::endl;
-    std::cout << "RESULT : " << result << "\n" << std::endl;
+    //std::cout << "\nTYPE : " << ack_str << std::endl;
+    //std::cout << "CMD : " << cmd << std::endl;
+    //std::cout << "RESULT : " << result << "\n" << std::endl;
 
 
 
