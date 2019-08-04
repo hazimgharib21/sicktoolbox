@@ -368,7 +368,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     std::string GetSlidingMean();
     void SetPoseDataFormat(uint8_t outputMode, uint8_t showOptParam);
     std::string GetPoseDataFormat();
-    void SetLandmarkDataFormat(bool format, bool showOptParam, int landmarkFilter);
+    void SetLandmarkDataFormat(int format, int showOptParam, int landmarkFilter);
     std::string GetLandmarkDataFormat();
     std::string GetScanDataFormat();
     void SetTimeSync(uint8_t mode, uint8_t mask);
@@ -387,7 +387,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     std::string GetNClosestReflectors();
     void SetActionRadius(int min, int max);
     std::string GetActionRadius();
-    void SetReflectorThreshold(uint8_t percent);
+    void SetReflectorThreshold(int percent);
     std::string GetReflectorThreshold();
     void SetDataPermenant();
     void SyncTimeStamp();
@@ -399,7 +399,7 @@ class SickNav350 : public SickLIDAR< SickNav350BufferMonitor, SickNav350Message 
     void EnableDHCP(bool isEnable);
     void AddLandmark(uint16_t num, int data[][7]);
     void EditLandmark(uint16_t num, uint16_t id, int x, int y, uint8_t lmType, uint8_t reflectorType, uint16_t size, uint16_t layer, uint16_t layerID);
-    void DeleteLandmark(uint16_t num, uint16_t id);
+    void DeleteLandmark(uint16_t num, int id[]);
     void GetLandmark(uint16_t num, uint16_t id);
     void GetLayer(uint16_t id);
     void GetLayout();

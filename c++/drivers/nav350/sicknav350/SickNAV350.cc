@@ -988,6 +988,152 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
   }
 
+  void SickNav350::SetLandmarkDataFormat(int format, int showOptParam, int landmarkFilter)
+  {
+		uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+		int count=0;
+		std::string command_type=this->WRITEBYNAME_COMMAND;
+		std::string command=this->LMDATAFORMAT_COMMAND;
+
+		for (int i=0;i<command_type.length();i++)
+		{
+			payload_buffer[count]=command_type[i];
+			count++;
+		}
+
+		payload_buffer[count]=' ';
+		count++;
+
+		for (int i=0;i<command.length();i++)
+		{
+			payload_buffer[count]=command[i];
+			count++;
+		}
+
+		payload_buffer[count]=' ';
+		count++;
+		char c[100];
+		sprintf(c, "%x",(int)(format));
+
+		for(int i = 0; i < strlen(c); i++){
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+		}
+
+		payload_buffer[count]=' ';
+		count++;
+		sprintf(c, "%x",(int)(showOptParam));
+
+		for(int i = 0; i < strlen(c); i++){
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+		}
+
+		payload_buffer[count]=' ';
+		count++;
+		sprintf(c, "%x",(int)(landmarkFilter));
+
+		for(int i = 0; i < strlen(c); i++){
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+		}
+
+		payload_buffer[count]=' ';
+		count++;
+	
+		/* Create the Sick messages */
+		SickNav350Message send_message(payload_buffer,count);
+		SickNav350Message recv_message;
+
+		/* Send the message and check the reply */
+		try {
+			_sendMessageAndGetReply(send_message,recv_message);
+			_SplitReceivedMessage(recv_message);
+		}
+
+		catch(SickTimeoutException &sick_timeout_exception) {
+			std::cerr << "sick_timeout_exception" << std::endl;
+
+			throw;
+		}
+
+		catch(SickIOException &sick_io_exception) {
+			std::cerr << "sick_io_exception" << std::endl;
+			throw;
+		}
+
+		catch(...) {
+			std::cerr << "SickNav350::_setLandmarkDataFormat - Unknown exception!" << std::endl;
+			throw;
+		}
+
+  }
+
+  void SickNav350::SetReflectorThreshold(int percent)
+  {
+		uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+		int count=0;
+		std::string command_type=this->WRITEBYNAME_COMMAND;
+		std::string command=this->REFLTHRESHOLD_COMMAND;
+
+		for (int i=0;i<command_type.length();i++)
+		{
+			payload_buffer[count]=command_type[i];
+			count++;
+		}
+
+		payload_buffer[count]=' ';
+		count++;
+
+		for (int i=0;i<command.length();i++)
+		{
+			payload_buffer[count]=command[i];
+			count++;
+		}
+
+		payload_buffer[count]=' ';
+		count++;
+		char c[100];
+		sprintf(c, "%x",(int)(percent));
+
+		for(int i = 0; i < strlen(c); i++){
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+		}
+
+		payload_buffer[count]=' ';
+		count++;
+
+		/* Create the Sick messages */
+		SickNav350Message send_message(payload_buffer,count);
+		SickNav350Message recv_message;
+
+		/* Send the message and check the reply */
+		try {
+			_sendMessageAndGetReply(send_message,recv_message);
+			_SplitReceivedMessage(recv_message);
+		}
+
+		catch(SickTimeoutException &sick_timeout_exception) {
+			std::cerr << "sick_timeout_exception" << std::endl;
+
+			throw;
+		}
+
+		catch(SickIOException &sick_io_exception) {
+			std::cerr << "sick_io_exception" << std::endl;
+			throw;
+		}
+
+		catch(...) {
+			std::cerr << "SickNav350::_setReflectorThreshold - Unknown exception!" << std::endl;
+			throw;
+		}
+
+  }
+
+
+
   void SickNav350::SetCurrentLayer(uint16_t layer){
 
 	  uint8_t payload_buffer[SickNav350Message::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
@@ -1302,6 +1448,132 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 
 
   }
+
+  void SickNav350::DeleteLandmark(uint16_t num, int id[]){
+
+		uint8_t payload_buffer[500] = {0};
+		int count=0;
+		std::string command_type=this->METHODCALL_COMMAND;
+		std::string command=this->DELETELANDMARK_COMMAND;
+		for (int i=0;i<command_type.length();i++)
+		{
+			payload_buffer[count]=command_type[i];
+			count++;
+		}
+		payload_buffer[count]=' ';
+		count++;
+		for (int i=0;i<command.length();i++)
+		{
+			payload_buffer[count]=command[i];
+			count++;
+		}
+		payload_buffer[count]=' ';
+		count++;
+		char c[100];
+
+		sprintf(c, "%x", (int)(num));
+
+		for(int i = 0; i < strlen(c); i++){
+			payload_buffer[count] = toupper(c[i]);
+			count++;
+		}
+
+		for(int i = 0; i < num; i++){
+
+			payload_buffer[count] = ' ';
+			count++;
+
+			sprintf(c, "%d", (int)(id[i]));
+
+			for(int k = 0; k < strlen(c); k++){
+				payload_buffer[count] = c[k];
+				count++;
+			}
+
+		}
+
+		std::cout << payload_buffer << std::endl;
+
+			SickNav350Message send_message(payload_buffer,count);
+			SickNav350Message recv_message;
+
+			try {
+				_sendMessageAndGetReply(send_message,recv_message);
+				//_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+				//sick_nav350_sector_data_t.
+				//	      _SplitReceivedMessage(recv_message);
+			}
+
+			catch(SickTimeoutException &sick_timeout_exception) {
+				std::cerr << "sick_timeout_exception" << std::endl;
+
+				throw;
+			}
+
+			catch(SickIOException &sick_io_exception) {
+				std::cerr << "sick_io_exception" << std::endl;
+				throw;
+			}
+
+			catch(...) {
+				std::cerr << "SickNav350::_set current layer - Unknown exception!" << std::endl;
+				throw;
+			}
+
+  }
+
+  void SickNav350::GetLayout(){
+
+		uint8_t payload_buffer[500] = {0};
+		int count=0;
+		std::string command_type=this->METHODCALL_COMMAND;
+		std::string command=this->READLAYOUT_COMMAND;
+		for (int i=0;i<command_type.length();i++)
+		{
+			payload_buffer[count]=command_type[i];
+			count++;
+		}
+		payload_buffer[count]=' ';
+		count++;
+		for (int i=0;i<command.length();i++)
+		{
+			payload_buffer[count]=command[i];
+			count++;
+		}
+		payload_buffer[count]=' ';
+		count++;
+	
+		SickNav350Message send_message(payload_buffer,count);
+		SickNav350Message recv_message;
+
+		try {
+			_sendMessageAndGetReply(send_message,recv_message);
+			//_recvMessage(recv_message,byte_sequence,byte_sequence_length,DEFAULT_SICK_MESSAGE_TIMEOUT);
+			//sick_nav350_sector_data_t.
+			_SplitReceivedMessage(recv_message);
+		}
+
+		catch(SickTimeoutException &sick_timeout_exception) {
+			std::cerr << "sick_timeout_exception" << std::endl;
+
+			throw;
+		}
+
+		catch(SickIOException &sick_io_exception) {
+			std::cerr << "sick_io_exception" << std::endl;
+			throw;
+		}
+
+		catch(...) {
+			std::cerr << "SickNav350::_ReadLayout - Unknown exception!" << std::endl;
+			throw;
+		}
+
+
+
+  }
+
+
 
   void SickNav350::DoMapping()
   {
@@ -2794,7 +3066,9 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 			  PoseData_.timeStamp=_ConvertHexToDec(arg[count++]);
 			  PoseData_.meanDeviation=_ConvertHexToDec(arg[count++]);
 			  PoseData_.positionMode=_ConvertHexToDec(arg[count++]);
-			  PoseData_.infoState=_ConvertHexToDec(arg[count++]);
+        std::string message = arg[count++];
+        std::cout << message << std::endl;
+			  PoseData_.infoState= _ConvertHexToDec(message);
 			  PoseData_.numUsedReflectors=_ConvertHexToDec(arg[count++]);
 		  }
 
@@ -2859,7 +3133,6 @@ const std::string SickNav350::SETPOSEID_COMMAND="mNPOSSetPoseID";
 			  else
 			  {
 				  ReflectorData_.optional[i]=0;
-				  std::cout<<"no optional reflector data"<<std::endl;
 			  }
 
 		  }
